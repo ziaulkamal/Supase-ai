@@ -1,7 +1,6 @@
-import { Inter } from "next/font/google";
-import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
 
 export const metadata = {
   title: "Create Next App",
@@ -10,8 +9,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" data-theme="light">
+        <link rel="shortcut icon" href="/images/fav.png" type="image/x-icon"></link>
+        <link rel="stylesheet preload" href="/css/plugins/fontawesome-5.css" as="style"></link>
+        <link rel="stylesheet preload" href="/css/vendor/bootstrap.min.css" as="style"></link>
+        <link rel="stylesheet preload" href="/css/vendor/swiper.css" as="style"></link>
+        <link rel="stylesheet preload" href="/css/vendor/metismenu.css" as="style"></link>
+        <link rel="stylesheet preload" href="/css/vendor/magnific-popup.css" as="style"></link>
+        <link rel="stylesheet preload" href="/css/style.css" as="style"></link>
+        <body className="home-one">
+        <Header />
+        <Sidebar />
+
+        {children}
+        <Footer />
+        </body>
     </html>
   );
 }
