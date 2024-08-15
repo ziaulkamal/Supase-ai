@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { NextResponse } from 'next/server';
-import supabase from '@/app/lib/supabase';
 
+// Endpoint Telegram API
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}`;
+
+// Cache untuk menyimpan state pengguna
+const userStateCache = new Map();
 
 // Kirim pesan ke chat
 async function sendMessage(chatId, text, replyMarkup = {}) {
@@ -40,19 +43,9 @@ export async function POST(request) {
 
     const chatId = message?.chat.id || callbackQuery?.message?.chat.id;
 
-    // Mendapatkan data dari tabel state pengguna
-    const { data: userState, error: stateError } = await supabase
-      .from('user_states')
-      .select('*')
-      .eq('chat_id', chatId)
-      .single();
+    // Mendapatkan data dari cache state pengguna
+    const userState = userStateCache.get(chatId);
 
-    if (stateError) {
-      console.error('Error fetching user state:', stateError.message);
-      return NextResponse.json({ status: 'error', message: 'Internal server error.' });
-    }
-
-    // Jika ada pesan
     if (message) {
       const text = message.text.trim().toLowerCase();
 
@@ -60,7 +53,7 @@ export async function POST(request) {
       if (text === '/end') {
         if (userState) {
           await sendMessage(chatId, `Sesi fitur ${userState.state} telah selesai`);
-          await supabase.from('user_states').delete().eq('chat_id', chatId);
+          userStateCache.delete(chatId);
         } else {
           await sendMessage(chatId, 'Tidak ada sesi aktif yang ditemukan.');
         }
@@ -98,8 +91,7 @@ export async function POST(request) {
               : response.data.message;
 
             await sendMessage(chatId, responseMessage);
-            // Hapus state pengguna setelah selesai
-            await supabase.from('user_states').delete().eq('chat_id', chatId);
+            userStateCache.delete(chatId);
           } else {
             await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
           }
@@ -118,11 +110,9 @@ export async function POST(request) {
             : response.data.message;
 
           await sendMessage(chatId, responseMessage);
-          // Hapus state pengguna setelah selesai
-          await supabase.from('user_states').delete().eq('chat_id', chatId);
+          userStateCache.delete(chatId);
         }
       } else {
-        // Jika tidak ada sesi aktif, berikan umpan balik bahwa perintah tidak dikenali
         await sendMessage(chatId, 'Tidak ada sesi aktif. Gunakan /start untuk melihat opsi.');
       }
     } else if (callbackQuery) {
@@ -130,20 +120,11 @@ export async function POST(request) {
 
       if (data === 'create_article') {
         await sendMessage(chatId, 'Masukkan data artikel dalam format berikut: \n "Keyword"|"Category"|Total');
-        // Set state pengguna menjadi 'awaiting_article'
-        await supabase.from('user_states').upsert({
-          chat_id: chatId,
-          state: 'awaiting_article'
-        });
+        userStateCache.set(chatId, { state: 'awaiting_article' });
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
-        // Set state pengguna menjadi 'awaiting_token'
-        await supabase.from('user_states').upsert({
-          chat_id: chatId,
-          state: 'awaiting_token'
-        });
+        userStateCache.set(chatId, { state: 'awaiting_token' });
       } else if (data === 'data_content') {
-        // Mengambil data dari endpoint content_count
         try {
           const response = await axios.get(`${process.env.BASE_URL}/api/telegram/content_count`);
           if (response.data.status === 'ok') {
