@@ -127,7 +127,7 @@ export async function POST(request) {
           userStateCache.delete(chatId);
         }
       } else {
-        await sendMessage(chatId, 'Tidak ada sesi aktif. Gunakan /start untuk melihat opsi.');
+        await sendMessage(chatId, 'Untuk setiap aksi mulai dengan /run dan untuk mengakhiri sesi user /end');
       }
     } else if (callbackQuery) {
       const data = callbackQuery.data;
