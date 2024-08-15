@@ -44,7 +44,6 @@ export async function POST(request) {
     if (message) {
       const text = message.text.toLowerCase().trim();
 
-      // Cek apakah ini pesan untuk memulai bot
       if (text === '/start') {
         await sendMessage(chatId, 'Pilih salah satu opsi:', {
           inline_keyboard: [
@@ -55,7 +54,6 @@ export async function POST(request) {
           ]
         });
       } else {
-        // Mendapatkan data dari tabel state pengguna
         const { data: userState } = await supabase
           .from('user_states')
           .select('*')
@@ -64,12 +62,11 @@ export async function POST(request) {
 
         if (userState) {
           if (userState.state === 'awaiting_article') {
-            const entries = text.split('\n'); // Split input into multiple entries
+            const entries = text.split('\n').map(entry => entry.trim()); // Split input into multiple entries
 
             for (const entry of entries) {
-              const trimmedEntry = entry.trim();
-              if (trimmedEntry.startsWith('"') && trimmedEntry.includes('|')) {
-                const parts = trimmedEntry.split('|').map(part => part.trim());
+              if (entry.startsWith('"') && entry.includes('|')) {
+                const parts = entry.split('|').map(part => part.trim());
 
                 if (parts.length < 3) {
                   await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
@@ -122,20 +119,17 @@ export async function POST(request) {
 
       if (data === 'create_article') {
         await sendMessage(chatId, 'Masukkan data artikel dalam format "Keyword"|"Category"|Total');
-        // Set state pengguna menjadi 'awaiting_article'
         await supabase.from('user_states').upsert({
           chat_id: chatId,
           state: 'awaiting_article'
         });
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
-        // Set state pengguna menjadi 'awaiting_token'
         await supabase.from('user_states').upsert({
           chat_id: chatId,
           state: 'awaiting_token'
         });
       } else if (data === 'data_content') {
-        // Mendapatkan hit artikel dan kategori
         const contentCountResponse = await axios.get(`${process.env.BASE_URL}/api/telegram/content_count`);
         const { articleCount, categoryCount } = contentCountResponse.data;
 
