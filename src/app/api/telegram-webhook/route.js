@@ -60,6 +60,20 @@ export async function POST(request) {
         return NextResponse.json({ status: 'success' });
       }
 
+      // Cek jika perintah untuk memulai sesi baru
+      if (text === '/run') {
+        await sendMessage(chatId, 'Pilih salah satu opsi:', {
+          inline_keyboard: [
+            [{ text: 'Buat Artikel Baru', callback_data: 'create_article' }],
+            [{ text: 'Tambah Token', callback_data: 'add_token' }],
+            [{ text: 'Data Konten', callback_data: 'data_content' }],
+            [{ text: 'ℹ️ Bantuan', callback_data: 'help' }]
+          ]
+        });
+        userStateCache.set(chatId, { state: 'awaiting_option' });
+        return NextResponse.json({ status: 'success' });
+      }
+
       // Jika ada sesi aktif
       if (userState) {
         if (userState.state === 'awaiting_article') {
