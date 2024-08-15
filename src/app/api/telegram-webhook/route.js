@@ -4,14 +4,9 @@ import { NextResponse } from 'next/server';
 // URL untuk endpoint API Next.js yang akan menerima data artikel
 const API_URL = `${process.env.BASE_URL}/api/telegram/articles_data`;
 
-// ID chat untuk balasan (Opsional, jika diperlukan)
-const CHAT_ID = process.env.USER_ID;
-
 export async function POST(request) {
   try {
     const update = await request.json();
-
-    // Log pesan yang diterima dari Telegram
     console.log('Received update from Telegram:', update);
 
     // Ambil data dari pesan Telegram
@@ -22,23 +17,47 @@ export async function POST(request) {
 
     // Ambil teks perintah dari pesan
     const text = message.text.toLowerCase().trim();
+    const chatId = message.chat.id;
 
-    if (text === '/panduan') {
+    if (text.startsWith('/panduan')) {
       // Kirim panduan atau informasi
       await axios.post(
         `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
         {
-          chat_id: message.chat.id,
+          chat_id: chatId,
           text: 'Ini adalah panduan untuk menggunakan bot. Kirim /buatartikel untuk menyimpan artikel.'
         }
       );
     } else if (text.startsWith('/buatartikel')) {
-      // Kirim data ke endpoint API Next.js
-      const textParts = text.split(' ').slice(1); // Mengambil data setelah '/buatartikel'
-      const keyword = textParts[0] || 'default_keyword'; 
-      const category = textParts[1] || 'default_category'; 
-      const total = textParts[2] ? parseInt(textParts[2], 10) : 1; 
+      // Parse data setelah '/buatartikel'
+      const parts = text.split(' ').slice(1); // Mengambil data setelah '/buatartikel'
+      if (parts.length < 3) {
+        await axios.post(
+          `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+          {
+            chat_id: chatId,
+            text: 'Format perintah tidak benar. Gunakan: /buatartikel <keyword> <category> <total>'
+          }
+        );
+        return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
+      }
 
+      const keyword = parts[0];
+      const category = parts[1];
+      const total = parseInt(parts[2], 10);
+
+      if (isNaN(total)) {
+        await axios.post(
+          `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+          {
+            chat_id: chatId,
+            text: 'Total harus berupa angka.'
+          }
+        );
+        return NextResponse.json({ status: 'error', message: 'Total must be a number.' });
+      }
+
+      // Kirim data ke endpoint API Next.js
       const response = await axios.post(API_URL, {
         keyword,
         category,
@@ -53,7 +72,7 @@ export async function POST(request) {
       await axios.post(
         `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
         {
-          chat_id: message.chat.id,
+          chat_id: chatId,
           text: responseMessage
         }
       );
@@ -62,7 +81,7 @@ export async function POST(request) {
       await axios.post(
         `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
         {
-          chat_id: message.chat.id,
+          chat_id: chatId,
           text: 'Perintah tidak dikenali. Kirim /panduan untuk informasi atau /buatartikel untuk menyimpan artikel.'
         }
       );
