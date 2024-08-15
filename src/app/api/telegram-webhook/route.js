@@ -27,22 +27,20 @@ export async function POST(req) {
     const text = message.text;
 
     if (text.startsWith('/start')) {
-      // Show main menu
+      // Show main menu with icons
       await sendMessage(chatId, 'Welcome! Please choose an option from the menu below:', {
         keyboard: [
-          [{ text: 'Create Post' }],
-          [{ text: 'Add New Token' }],
-          [{ text: 'Count Posts' }],
-          [{ text: 'Help' }]
+          [{ text: '📝 Buat Artikel Baru' }, { text: '🔑 Tambah Token' }],
+          [{ text: '📊 Data Konten' }, { text: 'ℹ️ Bantuan' }]
         ],
-        resize_keyboard: true,
+        resize_keyboard: false,
         one_time_keyboard: true
       });
-    } else if (text === 'Create Post') {
+    } else if (text === '📝 Buat Artikel Baru') {
       await sendMessage(chatId, 'Please provide the keyword and category in the following format: "keyword, category"');
-    } else if (text === 'Add New Token') {
+    } else if (text === '🔑 Tambah Token') {
       await sendMessage(chatId, 'Please provide the new token in the format: "token your-token-value"');
-    } else if (text === 'Count Posts') {
+    } else if (text === '📊 Data Konten') {
       const { data, error } = await supabase.from('articles_ai').select('id');
       if (error) {
         await sendMessage(chatId, 'Error counting posts.');
@@ -50,8 +48,8 @@ export async function POST(req) {
         const postCount = data.length;
         await sendMessage(chatId, `Total number of posts: ${postCount}`);
       }
-    } else if (text === 'Help') {
-      await sendMessage(chatId, 'Available commands:\n/start - Show the main menu\nCreate Post - Create a new post\nAdd New Token - Add a new token\nCount Posts - Count total number of posts');
+    } else if (text === 'ℹ️ Bantuan') {
+      await sendMessage(chatId, 'Available commands:\n/start - Show the main menu\n📝 Buat Artikel Baru - Create a new post\n🔑 Tambah Token - Add a new token\n📊 Data Konten - Count total number of posts');
     } else if (text.startsWith('token ')) {
       // Add new token
       const [, token] = text.split(' ');
@@ -78,7 +76,7 @@ export async function POST(req) {
         await sendMessage(chatId, 'Please provide both keyword and category.');
       }
     } else {
-      await sendMessage(chatId, 'Unknown command. Type "Help" for a list of available commands.');
+      await sendMessage(chatId, 'Unknown command. Type "ℹ️ Bantuan" for a list of available commands.');
     }
 
     return NextResponse.json({ status: 'ok' });
