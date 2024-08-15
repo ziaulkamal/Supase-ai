@@ -13,7 +13,7 @@ pnpm dev
 # or
 bun dev
 ```
-
+curl -X POST "https://api.telegram.org/bot7429366317:AAG-bBFwJcEby0pZ-eyoZv2TPgXmdqEWSLY/setWebhook?url=https://supase-ai.vercel.app/api/telegram-webhook"
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
