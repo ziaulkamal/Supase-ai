@@ -10,9 +10,18 @@ const TOKEN_API_URL = `${process.env.BASE_URL}/api/telegram/token_data`;
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}`;
 
 async function sendMessage(chatId, text, replyMarkup = {}) {
-  await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
+  const response = await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
     chat_id: chatId,
     text,
+    reply_markup: replyMarkup
+  });
+  return response.data.result; // Mengembalikan objek pesan
+}
+
+async function editMessageReplyMarkup(chatId, messageId, replyMarkup = {}) {
+  await axios.post(`${TELEGRAM_API_URL}/editMessageReplyMarkup`, {
+    chat_id: chatId,
+    message_id: messageId,
     reply_markup: replyMarkup
   });
 }
@@ -33,13 +42,14 @@ export async function POST(request) {
     const callbackQuery = update.callback_query;
 
     const chatId = message?.chat.id || callbackQuery?.message?.chat.id;
+    const messageId = message?.message_id || callbackQuery?.message.message_id;
 
     if (message) {
       const text = message.text.toLowerCase().trim();
 
       if (text === '/start') {
         // Kirim tombol
-        await sendMessage(chatId, 'Pilih salah satu opsi:', {
+        const sentMessage = await sendMessage(chatId, 'Pilih salah satu opsi:', {
           inline_keyboard: [
             [{ text: 'Buat Artikel Baru', callback_data: 'create_article' }],
             [{ text: 'Tambah Token', callback_data: 'add_token' }],
@@ -47,19 +57,26 @@ export async function POST(request) {
             [{ text: 'ℹ️ Bantuan', callback_data: 'help' }]
           ]
         });
+        
+        // Simpan message_id untuk referensi lebih lanjut jika perlu
+        // Contoh menyimpan di Supabase atau cache
       }
     } else if (callbackQuery) {
       const data = callbackQuery.data;
-      const messageId = callbackQuery.message.message_id;
 
       if (data === 'create_article') {
         await sendMessage(chatId, 'Masukkan data artikel dalam format "Keyword"|"Category"|Total');
+        // Misalnya, kita hapus tombol sebelumnya jika diperlukan
+        await editMessageReplyMarkup(chatId, messageId, {});
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
+        await editMessageReplyMarkup(chatId, messageId, {});
       } else if (data === 'data_content') {
         await sendMessage(chatId, 'Menampilkan data konten...');
+        await editMessageReplyMarkup(chatId, messageId, {});
       } else if (data === 'help') {
         await sendMessage(chatId, 'Ini adalah panduan bantuan. Gunakan tombol untuk mengakses berbagai fitur.');
+        await editMessageReplyMarkup(chatId, messageId, {});
       }
 
       // Acknowledge the callback
