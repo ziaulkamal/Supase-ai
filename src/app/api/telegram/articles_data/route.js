@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import supabase from '@/app/lib/supabase'; // Import client Supabase dari lib
+import supabase from '@/app/lib/supabase';
 
 export async function POST(req) {
   try {

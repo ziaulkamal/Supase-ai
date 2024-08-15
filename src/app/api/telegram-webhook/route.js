@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import fetch from 'node-fetch'; // Pastikan fetch tersedia atau gunakan library seperti 'node-fetch'
-import supabase from '@/app/lib/supabase'; // Import client Supabase dari lib
+import fetch from 'node-fetch';
+import supabase from '@/app/lib/supabase';
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const TELEGRAM_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
@@ -28,16 +28,13 @@ export async function POST(req) {
     const chatId = message.chat.id;
     const text = message.text;
 
-    console.log(`Received message: ${text}`); // Debugging
-
     if (text.startsWith('/start')) {
-      // Show main menu with icons
       await sendMessage(chatId, 'Welcome! Please choose an option from the menu below:', {
         keyboard: [
           [{ text: '📝 Buat Artikel Baru' }, { text: '🔑 Tambah Token' }],
           [{ text: '📊 Data Konten' }, { text: 'ℹ️ Bantuan' }]
         ],
-        resize_keyboard: false,
+        resize_keyboard: true,
         one_time_keyboard: true
       });
     } else if (text === '📝 Buat Artikel Baru') {
@@ -63,14 +60,10 @@ export async function POST(req) {
     } else if (text === 'ℹ️ Bantuan') {
       await sendMessage(chatId, 'Available commands:\n/start - Show the main menu\n📝 Buat Artikel Baru - Create a new post\n🔑 Tambah Token - Add a new token\n📊 Data Konten - Count total number of posts');
     } else if (message.reply_to_message && message.reply_to_message.text.startsWith('Please enter the keyword')) {
-      // Handle the input for creating a new post
       const [keyword, category, total] = text.split(',').map(s => s.trim());
       const isValid = keyword && category && !isNaN(total);
 
-      console.log(`Create post data: ${keyword}, ${category}, ${total}`); // Debugging
-
       if (isValid) {
-        // Send the data to the articles_data API endpoint
         const response = await fetch(ARTICLES_DATA_API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -83,10 +76,8 @@ export async function POST(req) {
         await sendMessage(chatId, 'Format Anda tidak sesuai. Mohon masukkan data dengan format: "keyword, category, total".');
       }
     } else if (message.reply_to_message && message.reply_to_message.text.startsWith('Please provide the new token')) {
-      // Handle the input for adding a new token
       const [, token] = text.split(' ');
       if (token) {
-        // Send the token data to the token_data API endpoint
         const response = await fetch(TOKEN_DATA_API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
