@@ -49,30 +49,11 @@ export async function POST(request) {
             [{ text: 'ℹ️ Bantuan', callback_data: 'help' }]
           ]
         });
-      }
-    } else if (callbackQuery) {
-      const data = callbackQuery.data;
-      const messageId = callbackQuery.message.message_id;
-
-      if (data === 'create_article') {
-        await sendMessage(chatId, 'Masukkan data artikel dalam format "Keyword"|"Category"|Total');
-      } else if (data === 'add_token') {
-        await sendMessage(chatId, 'Masukkan secret key token');
-      } else if (data === 'data_content') {
-        await sendMessage(chatId, 'Menampilkan data konten...');
-      } else if (data === 'help') {
-        await sendMessage(chatId, 'Ini adalah panduan bantuan. Gunakan tombol untuk mengakses berbagai fitur.');
-      }
-
-      await answerCallbackQuery(callbackQuery.id, 'Opsi dipilih!');
-    } else if (message && message.text) {
-      const text = message.text.trim();
-
-      if (text.startsWith('"') && text.includes('|')) {
+      } else if (text.startsWith('"') && text.includes('|')) {
         const parts = text.split('|').map(part => part.trim());
 
         if (parts.length < 3) {
-          await sendMessage(chatId, 'Format perintah tidak benar. Gunakan: "Keyword"|"Category"|Total');
+          await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
           return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
         }
 
@@ -107,6 +88,21 @@ export async function POST(request) {
 
         await sendMessage(chatId, responseMessage);
       }
+    } else if (callbackQuery) {
+      const data = callbackQuery.data;
+      const messageId = callbackQuery.message.message_id;
+
+      if (data === 'create_article') {
+        await sendMessage(chatId, 'Masukkan data artikel dalam format "Keyword"|"Category"|Total');
+      } else if (data === 'add_token') {
+        await sendMessage(chatId, 'Masukkan secret key token');
+      } else if (data === 'data_content') {
+        await sendMessage(chatId, 'Menampilkan data konten...');
+      } else if (data === 'help') {
+        await sendMessage(chatId, 'Ini adalah panduan bantuan. Gunakan tombol untuk mengakses berbagai fitur.');
+      }
+
+      await answerCallbackQuery(callbackQuery.id, 'Opsi dipilih!');
     }
 
     return NextResponse.json({ status: 'success' });

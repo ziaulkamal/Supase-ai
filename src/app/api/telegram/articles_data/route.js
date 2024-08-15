@@ -11,6 +11,7 @@ export async function POST(req) {
       ]);
 
       if (error) {
+        console.error('Error saving article data:', error);
         return NextResponse.json({ status: 'error', message: 'Error saving article data.' });
       } else {
         return NextResponse.json({ status: 'ok', message: 'Data Anda sudah diproses dan masuk ke jadwal.' });
