@@ -7,7 +7,7 @@ export async function POST(req) {
 
     if (keyword && category && !isNaN(total)) {
       const { error } = await supabase.from('telegram_articles').insert([
-        { keyword, category, total, status: 'pending', created_at: new Date(), updated_at: new Date() }
+        { keyword, category, total, status: false, created_at: new Date(), updated_at: new Date() }
       ]);
 
       if (error) {
