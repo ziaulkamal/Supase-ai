@@ -22,7 +22,7 @@ async function sendMessage(chatId, text, replyMarkup = {}) {
 
 // Function to handle /start command
 async function handleStart(chatId) {
-  await sendMessage(chatId, 'Welcome! Please choose an option from the menu below:', {
+  await sendMessage(chatId, 'Selamat datang! Silakan pilih opsi dari menu di bawah:', {
     keyboard: [
       [{ text: '📝 Buat Artikel Baru' }, { text: '🔑 Tambah Token' }],
       [{ text: '📊 Data Konten' }, { text: 'ℹ️ Bantuan' }]
@@ -34,7 +34,7 @@ async function handleStart(chatId) {
 
 // Function to handle Create Post
 async function handleCreatePost(chatId) {
-  await sendMessage(chatId, 'Please enter the keyword, category, and total number of posts in the following format: "keyword, category, total"', {
+  await sendMessage(chatId, 'Cara penggunaan: /articles "keyword,category,total". Contoh: /articles "teknologi, gadget, 10"', {
     reply_markup: {
       force_reply: true
     }
@@ -43,7 +43,7 @@ async function handleCreatePost(chatId) {
 
 // Function to handle Add New Token
 async function handleAddToken(chatId) {
-  await sendMessage(chatId, 'Please provide the new token in the format: "token your-token-value"', {
+  await sendMessage(chatId, 'Cara penggunaan: /token "masukkan token gemini". Contoh: /token "your-token-value"', {
     reply_markup: {
       force_reply: true
     }
@@ -54,16 +54,16 @@ async function handleAddToken(chatId) {
 async function handleCountPosts(chatId) {
   const { data, error } = await supabase.from('articles_ai').select('id');
   if (error) {
-    await sendMessage(chatId, 'Error counting posts.');
+    await sendMessage(chatId, 'Terjadi kesalahan saat menghitung postingan.');
   } else {
     const postCount = data.length;
-    await sendMessage(chatId, `Total number of posts: ${postCount}`);
+    await sendMessage(chatId, `Jumlah total postingan: ${postCount}`);
   }
 }
 
 // Function to handle Help command
 async function handleHelp(chatId) {
-  await sendMessage(chatId, 'Available commands:\n/start - Show the main menu\n📝 Buat Artikel Baru - Create a new post\n🔑 Tambah Token - Add a new token\n📊 Data Konten - Count total number of posts');
+  await sendMessage(chatId, 'Perintah yang tersedia:\n/start - Tampilkan menu utama\n📝 Buat Artikel Baru - Buat postingan baru\n🔑 Tambah Token - Tambahkan token baru\n📊 Data Konten - Hitung total jumlah postingan\nℹ️ Bantuan - Tampilkan bantuan');
 }
 
 // Function to handle Create Post Data
@@ -98,7 +98,7 @@ async function handleTokenData(chatId, text) {
 
     await sendMessage(chatId, result.message);
   } else {
-    await sendMessage(chatId, 'Please provide the token.');
+    await sendMessage(chatId, 'Token tidak valid. Mohon masukkan token yang benar.');
   }
 }
 
@@ -112,20 +112,22 @@ export async function POST(req) {
 
     if (text.startsWith('/start')) {
       await handleStart(chatId);
-    } else if (text === '📝 Buat Artikel Baru') {
+    } else if (text.startsWith('/articles')) {
       await handleCreatePost(chatId);
-    } else if (text === '🔑 Tambah Token') {
+    } else if (text.startsWith('/token')) {
       await handleAddToken(chatId);
     } else if (text === '📊 Data Konten') {
       await handleCountPosts(chatId);
     } else if (text === 'ℹ️ Bantuan') {
       await handleHelp(chatId);
-    } else if (message.reply_to_message && message.reply_to_message.text.startsWith('Please enter the keyword')) {
-      await handlePostData(chatId, text);
-    } else if (message.reply_to_message && message.reply_to_message.text.startsWith('Please provide the new token')) {
-      await handleTokenData(chatId, text);
+    } else if (message.reply_to_message && message.reply_to_message.text.startsWith('Cara penggunaan: /articles')) {
+      const postData = text.replace(/^\/articles\s/, '');
+      await handlePostData(chatId, postData);
+    } else if (message.reply_to_message && message.reply_to_message.text.startsWith('Cara penggunaan: /token')) {
+      const tokenData = text.replace(/^\/token\s/, '');
+      await handleTokenData(chatId, tokenData);
     } else {
-      await sendMessage(chatId, 'Unknown command. Type "ℹ️ Bantuan" for a list of available commands.');
+      await sendMessage(chatId, 'Perintah tidak dikenal. Ketik "ℹ️ Bantuan" untuk daftar perintah yang tersedia.');
     }
 
     return NextResponse.json({ status: 'ok' });
