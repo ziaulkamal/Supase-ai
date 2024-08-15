@@ -25,25 +25,30 @@ export async function POST(request) {
         `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
         {
           chat_id: chatId,
-          text: 'Ini adalah panduan untuk menggunakan bot. Kirim /buatartikel untuk menyimpan artikel.'
+          text: 'Ini adalah panduan untuk menggunakan bot. Kirim /buatartikel "Keyword"|"Category"|10 untuk menyimpan artikel.'
         }
       );
     } else if (text.startsWith('/buatartikel')) {
-      // Parse data setelah '/buatartikel'
-      const parts = text.split(' ').slice(1); // Mengambil data setelah '/buatartikel'
+      // Menghapus '/buatartikel' dari teks
+      const commandText = text.slice('/buatartikel'.length).trim();
+      
+      // Pisahkan berdasarkan '|'
+      const parts = commandText.split('|').map(part => part.trim());
+      
       if (parts.length < 3) {
         await axios.post(
           `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
           {
             chat_id: chatId,
-            text: 'Format perintah tidak benar. Gunakan: /buatartikel <keyword> <category> <total>'
+            text: 'Format perintah tidak benar. Gunakan: /buatartikel "Keyword"|"Category"|Total'
           }
         );
         return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
       }
 
-      const keyword = parts[0];
-      const category = parts[1];
+      // Ekstrak data
+      const keyword = parts[0].replace(/^"|"$/g, ''); // Menghapus kutip ganda di sekitar keyword
+      const category = parts[1].replace(/^"|"$/g, ''); // Menghapus kutip ganda di sekitar category
       const total = parseInt(parts[2], 10);
 
       if (isNaN(total)) {
