@@ -38,9 +38,9 @@ export async function POST(request) {
     const chatId = message?.chat.id || callbackQuery?.message?.chat.id;
 
     if (message) {
-      const text = message.text.toLowerCase().trim();
+      const text = message.text.trim();
 
-      if (text === '/start') {
+      if (text.toLowerCase() === '/start') {
         await sendMessage(chatId, 'Pilih salah satu opsi:', {
           inline_keyboard: [
             [{ text: 'Buat Artikel Baru', callback_data: 'create_article' }],
@@ -97,7 +97,19 @@ export async function POST(request) {
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
       } else if (data === 'data_content') {
-        await sendMessage(chatId, 'Menampilkan data konten...');
+        // Mengambil data dari endpoint content_count
+        try {
+          const response = await axios.get(`${process.env.BASE_URL}/api/telegram/content_count`);
+          if (response.data.status === 'ok') {
+            const { articleCount, categoryCount } = response.data;
+            await sendMessage(chatId, `Jumlah Artikel: ${articleCount}\nJumlah Kategori Unik: ${categoryCount}`);
+          } else {
+            await sendMessage(chatId, 'Terjadi kesalahan saat mengambil data konten.');
+          }
+        } catch (error) {
+          console.error('Error fetching content count:', error.message);
+          await sendMessage(chatId, 'Terjadi kesalahan saat mengambil data konten.');
+        }
       } else if (data === 'help') {
         await sendMessage(chatId, 'Ini adalah panduan bantuan. Gunakan tombol untuk mengakses berbagai fitur.');
       }
