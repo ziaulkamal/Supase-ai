@@ -150,7 +150,39 @@ export async function POST(request) {
           await sendMessage(chatId, 'Terjadi kesalahan saat mengambil data konten.');
         }
       } else if (data === 'help') {
-        await sendMessage(chatId, 'Ini adalah panduan bantuan. Gunakan tombol untuk mengakses berbagai fitur.');
+        await sendMessage(chatId, `
+          Selamat datang di bot kami! Berikut adalah fitur-fitur yang tersedia:
+
+          1. **📝 Buat Artikel Baru**
+            - **Cara Penggunaan:** Klik tombol ini untuk memulai proses pembuatan artikel baru. Kirimkan data artikel dalam format: "Keyword"|"Category"|Total.
+            - **Contoh Format:** "Teknologi"|"Gadget"|10
+            - **NB:** Selama sesi belum di akhiri, maka anda bisa menambah data secara terus menerus sampai sesi di akhiri
+
+          2. **🔑 Tambah Token**
+            - **Cara Penggunaan:** Klik tombol ini untuk menambahkan token baru. Masukkan token Anda saat diminta.
+            - **Catatan:** Pastikan token yang Anda masukkan valid.
+             - **NB:** Selama sesi belum di akhiri, maka anda bisa menambah data secara terus menerus sampai sesi di akhiri
+
+          3. **📊 Data Konten**
+            - **Cara Penggunaan:** Klik tombol ini untuk mendapatkan informasi jumlah artikel dan kategori.
+            - **Keterangan:** Bot akan memberikan jumlah artikel dan kategori yang ada dalam sistem.
+
+          4. **ℹ️ Bantuan**
+            - **Cara Penggunaan:** Klik tombol ini untuk melihat panduan ini lagi.
+            - **Keterangan:** Panduan ini memberikan informasi tentang cara menggunakan bot dan fitur-fitur yang tersedia.
+
+          **Perintah Khusus:**
+
+          - **🚀 /run**
+            - **Fungsi:** Memulai sesi baru dan menampilkan opsi yang tersedia.
+            - **Cara Penggunaan:** Kirimkan perintah ini untuk melihat opsi-opsi yang dapat Anda pilih.
+
+          - **🔚 /end**
+            - **Fungsi:** Mengakhiri sesi aktif.
+            - **Cara Penggunaan:** Kirimkan perintah ini untuk menyelesaikan sesi yang sedang berlangsung dan menghapus status Anda.
+
+          Untuk bantuan lebih lanjut, gunakan tombol bantuan atau kirimkan pesan jika Anda membutuhkan bantuan tambahan.
+          `);
       }
 
       await answerCallbackQuery(callbackQuery.id, 'Opsi dipilih!');
