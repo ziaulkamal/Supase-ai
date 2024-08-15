@@ -105,7 +105,6 @@ export async function POST(request) {
               : response.data.message;
 
             await sendMessage(chatId, responseMessage);
-            userStateCache.delete(chatId);
           } else {
             await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
           }
@@ -124,7 +123,6 @@ export async function POST(request) {
             : response.data.message;
 
           await sendMessage(chatId, responseMessage);
-          userStateCache.delete(chatId);
         }
       } else {
         await sendMessage(chatId, 'Untuk setiap aksi mulai dengan /run dan untuk mengakhiri sesi user /end');
