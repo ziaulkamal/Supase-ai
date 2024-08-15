@@ -79,7 +79,7 @@ export async function POST(request) {
         await sendMessage(chatId, responseMessage);
       } else if (text) {
         const response = await axios.post(`${process.env.BASE_URL}/api/telegram/token_data`, {
-          secretKey: text
+          secretkey: text
         });
 
         const responseMessage = response.data.status === 'ok'

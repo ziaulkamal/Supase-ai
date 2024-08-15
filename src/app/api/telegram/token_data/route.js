@@ -8,7 +8,7 @@ export async function POST(req) {
 
     if (secretKey) {
       const { error } = await supabase.from('geminitoken').insert([
-        { secretKey, url_endpoint, status: true }
+        { secretkey, url_endpoint, status: true }
       ]);
 
       if (error) {
