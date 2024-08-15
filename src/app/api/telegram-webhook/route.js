@@ -153,35 +153,41 @@ export async function POST(request) {
         await sendMessage(chatId, `
 Selamat datang di bot kami! Berikut adalah fitur-fitur yang tersedia:
 
-1. **📝 Buat Artikel Baru**
-- **Cara Penggunaan:** Klik tombol ini untuk memulai proses pembuatan artikel baru. Kirimkan data artikel dalam format: "Keyword"|"Category"|Total.
-- **Contoh Format:** "Teknologi"|"Gadget"|10
-- **NB:** Selama sesi belum di akhiri, maka anda bisa menambah data secara terus menerus sampai sesi di akhiri
+📝 **Buat Artikel Baru**
+- Klik tombol ini untuk memulai proses pembuatan artikel baru. Kirimkan data artikel dalam format: "Keyword"|"Category"|Total.
+- Selama sesi belum di akhiri, maka anda bisa menambah data keyword secara terus menerus sampai sesi di akhiri
 
-2. **🔑 Tambah Token**
-- **Cara Penggunaan:** Klik tombol ini untuk menambahkan token baru. Masukkan token Anda saat diminta.
-- **Catatan:** Pastikan token yang Anda masukkan valid.
-- **NB:** Selama sesi belum di akhiri, maka anda bisa menambah data secara terus menerus sampai sesi di akhiri
 
-3. **📊 Data Konten**
-- **Cara Penggunaan:** Klik tombol ini untuk mendapatkan informasi jumlah artikel dan kategori.
-- **Keterangan:** Bot akan memberikan jumlah artikel dan kategori yang ada dalam sistem.
+🔑 **Tambah Token**
+- Klik tombol ini untuk menambahkan token baru. Masukkan token Anda saat diminta.
+- Pastikan token yang Anda masukkan valid.
+- Selama sesi belum di akhiri, maka anda bisa menambah Token secara terus menerus sampai sesi di akhiri
 
-4. **ℹ️ Bantuan**
-- **Cara Penggunaan:** Klik tombol ini untuk melihat panduan ini lagi.
-- **Keterangan:** Panduan ini memberikan informasi tentang cara menggunakan bot dan fitur-fitur yang tersedia.
 
-**Perintah Khusus:**
+📊 **Data Konten**
+- Klik tombol ini untuk mendapatkan informasi jumlah artikel dan kategori.
+- Bot akan memberikan jumlah artikel dan kategori yang ada dalam sistem.
 
-- **🚀 /run**
-- **Fungsi:** Memulai sesi baru dan menampilkan opsi yang tersedia.
-- **Cara Penggunaan:** Kirimkan perintah ini untuk melihat opsi-opsi yang dapat Anda pilih.
 
-- **🔚 /end**
-- **Fungsi:** Mengakhiri sesi aktif.
-- **Cara Penggunaan:** Kirimkan perintah ini untuk menyelesaikan sesi yang sedang berlangsung dan menghapus status Anda.
+ℹ️ **Bantuan**
+- Klik tombol ini untuk melihat panduan ini lagi.
+- Panduan ini memberikan informasi tentang cara menggunakan bot dan fitur-fitur yang tersedia.
 
-Untuk bantuan lebih lanjut, gunakan tombol bantuan atau kirimkan pesan jika Anda membutuhkan bantuan tambahan.
+
+
+**Perintah Khusus**
+
+🚀 /run
+- Memulai sesi baru dan menampilkan opsi yang tersedia.
+- Kirimkan perintah ini untuk melihat opsi-opsi yang dapat Anda pilih.
+
+
+🔚 /end
+- Mengakhiri sesi aktif.
+- Kirimkan perintah ini untuk menyelesaikan sesi yang sedang berlangsung dan menghapus status Anda.
+
+
+_Untuk bantuan lebih lanjut, gunakan tombol bantuan atau kirimkan pesan jika Anda membutuhkan bantuan tambahan_
           `);
       }
 
