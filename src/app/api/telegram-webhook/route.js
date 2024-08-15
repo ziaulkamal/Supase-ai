@@ -18,12 +18,7 @@ async function sendMessage(chatId, text, replyMarkup = {}) {
   });
 }
 
-// Helper function to request user input
-async function requestUserInput(chatId, text, replyMarkup) {
-  await sendMessage(chatId, text, { reply_markup: { force_reply: true } });
-}
-
-// Main POST function
+// Handle incoming updates from Telegram
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -32,8 +27,7 @@ export async function POST(req) {
     const text = message.text;
     const userId = message.from.id;
 
-    // Retrieve user's state from database or session
-    let userState = {}; // Ideally, retrieve this from a database or in-memory store
+    let userState = getUserState(userId); // Retrieve user state
 
     if (text.startsWith('/start')) {
       await sendMessage(chatId, 'Selamat datang! Silakan pilih opsi dari menu di bawah:', {
@@ -46,13 +40,13 @@ export async function POST(req) {
           one_time_keyboard: true
         }
       });
-      userState = { state: 'awaiting_action' }; // Reset state
+      setUserState(userId, { state: 'awaiting_action' }); // Reset state
     } else if (text === '📝 Buat Artikel Baru') {
-      userState = { state: 'awaiting_keyword' };
-      await requestUserInput(chatId, 'Masukkan keyword:', {});
+      setUserState(userId, { state: 'awaiting_keyword' });
+      await sendMessage(chatId, 'Masukkan keyword, kategori, dan total dalam format "keyword, kategori, total"');
     } else if (text === '🔑 Tambah Token') {
-      userState = { state: 'awaiting_token' };
-      await requestUserInput(chatId, 'Masukkan token Gemini:', {});
+      setUserState(userId, { state: 'awaiting_token' });
+      await sendMessage(chatId, 'Masukkan token Gemini:');
     } else if (text === '📊 Data Konten') {
       const { data, error } = await supabase.from('articles_ai').select('id');
       if (error) {
@@ -61,39 +55,27 @@ export async function POST(req) {
         const postCount = data.length;
         await sendMessage(chatId, `Jumlah total postingan: ${postCount}`);
       }
-      userState = { state: 'awaiting_action' }; // Reset state
+      setUserState(userId, { state: 'awaiting_action' }); // Reset state
     } else if (text === 'ℹ️ Bantuan') {
       await sendMessage(chatId, 'Perintah yang tersedia:\n/start - Tampilkan menu utama\n📝 Buat Artikel Baru - Buat postingan baru\n🔑 Tambah Token - Tambahkan token baru\n📊 Data Konten - Hitung total jumlah postingan\nℹ️ Bantuan - Tampilkan bantuan');
-      userState = { state: 'awaiting_action' }; // Reset state
-    } else if (userState.state === 'awaiting_keyword') {
-      userState = { ...userState, state: 'awaiting_category' };
-      userState.keyword = text;
-      await requestUserInput(chatId, 'Masukkan kategori:', {});
-    } else if (userState.state === 'awaiting_category') {
-      userState = { ...userState, state: 'awaiting_total' };
-      userState.category = text;
-      await requestUserInput(chatId, 'Masukkan total:', {});
-    } else if (userState.state === 'awaiting_total') {
-      userState = { ...userState, state: 'awaiting_action' };
-      userState.total = parseInt(text, 10);
-      if (isNaN(userState.total)) {
-        await sendMessage(chatId, 'Total harus berupa angka. Silakan masukkan kembali total:', {});
-        userState.state = 'awaiting_total';
-      } else {
-        // Save data to Supabase
+      setUserState(userId, { state: 'awaiting_action' }); // Reset state
+    } else if (userState?.state === 'awaiting_keyword') {
+      const [keyword, category, total] = text.split(',').map(s => s.trim());
+      if (keyword && category && !isNaN(total)) {
+        setUserState(userId, { state: 'awaiting_action' });
         const { error } = await supabase.from('telegram_articles').insert([
-          { keyword: userState.keyword, category: userState.category, total: userState.total, status: 'pending', created_at: new Date(), updated_at: new Date() }
+          { keyword, category, total: parseInt(total, 10), status: 'pending', created_at: new Date(), updated_at: new Date() }
         ]);
         if (error) {
           await sendMessage(chatId, 'Gagal menyimpan artikel.');
         } else {
           await sendMessage(chatId, 'Data Anda sudah diproses dan masuk ke jadwal.');
         }
-        // Clear user state
-        userState = { state: 'awaiting_action' };
+        clearUserState(userId);
+      } else {
+        await sendMessage(chatId, 'Format tidak sesuai. Pastikan formatnya adalah "keyword, kategori, total".');
       }
-    } else if (userState.state === 'awaiting_token') {
-      userState = { state: 'awaiting_action' };
+    } else if (userState?.state === 'awaiting_token') {
       const token = text;
       const response = await fetch(`${process.env.BASE_URL}/api/telegram/token_data`, {
         method: 'POST',
@@ -102,11 +84,10 @@ export async function POST(req) {
       });
       const result = await response.json();
       await sendMessage(chatId, result.message);
+      clearUserState(userId);
     } else {
       await sendMessage(chatId, 'Perintah tidak dikenal. Ketik "ℹ️ Bantuan" untuk daftar perintah yang tersedia.');
     }
-
-    // Here you should save/update userState in your database or in-memory store
 
     return NextResponse.json({ status: 'ok' });
   } catch (error) {
