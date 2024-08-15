@@ -64,42 +64,45 @@ export async function POST(request) {
 
         if (userState) {
           if (userState.state === 'awaiting_article') {
-            // Proses perintah buat artikel baru
-            if (text.startsWith('"') && text.includes('|')) {
-              const parts = text.split('|').map(part => part.trim());
+            const entries = text.split('\n'); // Split input into multiple entries
 
-              if (parts.length < 3) {
+            for (const entry of entries) {
+              const trimmedEntry = entry.trim();
+              if (trimmedEntry.startsWith('"') && trimmedEntry.includes('|')) {
+                const parts = trimmedEntry.split('|').map(part => part.trim());
+
+                if (parts.length < 3) {
+                  await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
+                  return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
+                }
+
+                const keyword = parts[0].replace(/^"|"$/g, '');
+                const category = parts[1].replace(/^"|"$/g, '');
+                const total = parseInt(parts[2], 10);
+
+                if (isNaN(total)) {
+                  await sendMessage(chatId, 'Total harus berupa angka.');
+                  return NextResponse.json({ status: 'error', message: 'Total must be a number.' });
+                }
+
+                const response = await axios.post(`${process.env.BASE_URL}/api/telegram/articles_data`, {
+                  keyword,
+                  category,
+                  total
+                });
+
+                const responseMessage = response.data.status === 'ok'
+                  ? `Data untuk "${keyword}" berhasil diproses.`
+                  : response.data.message;
+
+                await sendMessage(chatId, responseMessage);
+              } else {
                 await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
-                return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
               }
-
-              const keyword = parts[0].replace(/^"|"$/g, '');
-              const category = parts[1].replace(/^"|"$/g, '');
-              const total = parseInt(parts[2], 10);
-
-              if (isNaN(total)) {
-                await sendMessage(chatId, 'Total harus berupa angka.');
-                return NextResponse.json({ status: 'error', message: 'Total must be a number.' });
-              }
-
-              const response = await axios.post(`${process.env.BASE_URL}/api/telegram/articles_data`, {
-                keyword,
-                category,
-                total
-              });
-
-              const responseMessage = response.data.status === 'ok'
-                ? 'Data Anda sudah diproses dan masuk ke jadwal.'
-                : response.data.message;
-
-              await sendMessage(chatId, responseMessage);
-              // Hapus state pengguna setelah selesai
-              await supabase.from('user_states').delete().eq('chat_id', chatId);
-            } else {
-              await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
             }
+
+            await supabase.from('user_states').delete().eq('chat_id', chatId);
           } else if (userState.state === 'awaiting_token') {
-            // Proses perintah tambah token
             const response = await axios.post(`${process.env.BASE_URL}/api/telegram/token_data`, {
               secretkey: text
             });
@@ -109,7 +112,6 @@ export async function POST(request) {
               : response.data.message;
 
             await sendMessage(chatId, responseMessage);
-            // Hapus state pengguna setelah selesai
             await supabase.from('user_states').delete().eq('chat_id', chatId);
           }
         }
