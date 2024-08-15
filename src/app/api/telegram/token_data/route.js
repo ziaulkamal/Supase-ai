@@ -18,7 +18,7 @@ export async function POST(req) {
         return NextResponse.json({ status: 'ok', message: 'Token berhasil ditambahkan.' });
       }
     } else {
-      return NextResponse.json({ status: 'error', message: 'Token tidak valid. Mohon masukkan token yang benar.' });
+      return NextResponse.json({ status: 'error', message: 'Token tidak valid. Karena Sudah ada sebelumnya !.' });
     }
   } catch (error) {
     console.error('Error saving token data:', error);
