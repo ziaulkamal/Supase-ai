@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import fetch from 'node-fetch';
-import supabase from '@/lib/supabase';
+import supabase from '@/app/lib/supabase';
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const TELEGRAM_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
