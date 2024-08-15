@@ -28,6 +28,8 @@ export async function POST(req) {
     const chatId = message.chat.id;
     const text = message.text;
 
+    console.log(`Received message: ${text}`); // Debugging
+
     if (text.startsWith('/start')) {
       // Show main menu with icons
       await sendMessage(chatId, 'Welcome! Please choose an option from the menu below:', {
@@ -64,6 +66,8 @@ export async function POST(req) {
       // Handle the input for creating a new post
       const [keyword, category, total] = text.split(',').map(s => s.trim());
       const isValid = keyword && category && !isNaN(total);
+
+      console.log(`Create post data: ${keyword}, ${category}, ${total}`); // Debugging
 
       if (isValid) {
         // Send the data to the articles_data API endpoint
