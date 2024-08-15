@@ -2,10 +2,8 @@ import axios from 'axios';
 import { NextResponse } from 'next/server';
 import supabase from '@/app/lib/supabase';
 
-// Endpoint Telegram API
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}`;
 
-// Kirim pesan ke chat
 async function sendMessage(chatId, text, replyMarkup = {}) {
   try {
     await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
@@ -18,7 +16,6 @@ async function sendMessage(chatId, text, replyMarkup = {}) {
   }
 }
 
-// Menjawab callback query
 async function answerCallbackQuery(callbackQueryId, text) {
   try {
     await axios.post(`${TELEGRAM_API_URL}/answerCallbackQuery`, {
@@ -30,7 +27,6 @@ async function answerCallbackQuery(callbackQueryId, text) {
   }
 }
 
-// Menangani permintaan POST dari webhook
 export async function POST(request) {
   try {
     const update = await request.json();
@@ -42,10 +38,9 @@ export async function POST(request) {
     const chatId = message?.chat.id || callbackQuery?.message?.chat.id;
 
     if (message) {
-      const text = message.text.toLowerCase().trim();
+      const text = message.text.trim();
 
-      // Cek apakah ini pesan untuk memulai bot
-      if (text === '/start') {
+      if (text.toLowerCase() === '/start') {
         await sendMessage(chatId, 'Pilih salah satu opsi:', {
           inline_keyboard: [
             [{ text: 'Buat Artikel Baru', callback_data: 'create_article' }],
@@ -54,90 +49,67 @@ export async function POST(request) {
             [{ text: 'ℹ️ Bantuan', callback_data: 'help' }]
           ]
         });
-      } else {
-        // Mendapatkan data dari tabel state pengguna
-        const { data: userState } = await supabase
-          .from('user_states')
-          .select('*')
-          .eq('chat_id', chatId)
-          .single();
+      } else if (text.startsWith('"') && text.includes('|')) {
+        const parts = text.split('|').map(part => part.trim());
 
-        if (userState) {
-          if (userState.state === 'awaiting_article') {
-            // Proses perintah buat artikel baru
-            if (text.startsWith('"') && text.includes('|')) {
-              const parts = text.split('|').map(part => part.trim());
-
-              if (parts.length < 3) {
-                await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
-                return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
-              }
-
-              const keyword = parts[0].replace(/^"|"$/g, '');
-              const category = parts[1].replace(/^"|"$/g, '');
-              const total = parseInt(parts[2], 10);
-
-              if (isNaN(total)) {
-                await sendMessage(chatId, 'Total harus berupa angka.');
-                return NextResponse.json({ status: 'error', message: 'Total must be a number.' });
-              }
-
-              const response = await axios.post(`${process.env.BASE_URL}/api/telegram/articles_data`, {
-                keyword,
-                category,
-                total
-              });
-
-              const responseMessage = response.data.status === 'ok'
-                ? 'Data Anda sudah diproses dan masuk ke jadwal.'
-                : response.data.message;
-
-              await sendMessage(chatId, responseMessage);
-              // Hapus state pengguna setelah selesai
-              await supabase.from('user_states').delete().eq('chat_id', chatId);
-            } else {
-              await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
-            }
-          } else if (userState.state === 'awaiting_token') {
-            // Proses perintah tambah token
-            const response = await axios.post(`${process.env.BASE_URL}/api/telegram/token_data`, {
-              secretkey: text
-            });
-
-            const responseMessage = response.data.status === 'ok'
-              ? 'Token berhasil ditambahkan.'
-              : response.data.message;
-
-            await sendMessage(chatId, responseMessage);
-            // Hapus state pengguna setelah selesai
-            await supabase.from('user_states').delete().eq('chat_id', chatId);
-          }
+        if (parts.length < 3) {
+          await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
+          return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
         }
+
+        const keyword = parts[0].replace(/^"|"$/g, '');
+        const category = parts[1].replace(/^"|"$/g, '');
+        const total = parseInt(parts[2], 10);
+
+        if (isNaN(total)) {
+          await sendMessage(chatId, 'Total harus berupa angka.');
+          return NextResponse.json({ status: 'error', message: 'Total must be a number.' });
+        }
+
+        const response = await axios.post(`${process.env.BASE_URL}/api/telegram/articles_data`, {
+          keyword,
+          category,
+          total
+        });
+
+        const responseMessage = response.data.status === 'ok'
+          ? 'Data Anda sudah diproses dan masuk ke jadwal.'
+          : response.data.message;
+
+        await sendMessage(chatId, responseMessage);
+      } else if (text) {
+        const response = await axios.post(`${process.env.BASE_URL}/api/telegram/token_data`, {
+          secretkey: text
+        });
+
+        const responseMessage = response.data.status === 'ok'
+          ? 'Token berhasil ditambahkan.'
+          : response.data.message;
+
+        await sendMessage(chatId, responseMessage);
       }
     } else if (callbackQuery) {
       const data = callbackQuery.data;
       const messageId = callbackQuery.message.message_id;
 
       if (data === 'create_article') {
-        await sendMessage(chatId, 'Masukkan data artikel dalam format "Keyword"|"Category"|Total');
-        // Set state pengguna menjadi 'awaiting_article'
-        await supabase.from('user_states').upsert({
-          chat_id: chatId,
-          state: 'awaiting_article'
-        });
+        await sendMessage(chatId, 'Masukkan data artikel dalam format berikut: \n "Keyword"|"Category"|Total');
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
-        // Set state pengguna menjadi 'awaiting_token'
-        await supabase.from('user_states').upsert({
-          chat_id: chatId,
-          state: 'awaiting_token'
-        });
       } else if (data === 'data_content') {
-        // Mendapatkan hit artikel dan kategori
-        const contentCountResponse = await axios.get(`${process.env.BASE_URL}/api/telegram/content_count`);
-        const { articleCount, categoryCount } = contentCountResponse.data;
-
-        await sendMessage(chatId, `Jumlah artikel: ${articleCount}\nJumlah kategori: ${categoryCount}`);
+        // Mengambil data dari endpoint content_count
+        try {
+          const response = await axios.get(`${process.env.BASE_URL}/api/telegram/content_count`);
+          if (response.data.status === 'ok') {
+            const { articleCount, categoryCount } = response.data;
+            await sendMessage(chatId, `Jumlah Artikel: ${articleCount}\nJumlah Kategori Unik: ${categoryCount}`);
+          } else {
+            await sendMessage(chatId, 'Terjadi kesalahan saat mengambil data konten.');
+          }
+        } catch (error) {
+          console.error('Error fetching content count:', error.message);
+          await sendMessage(chatId, 'Terjadi kesalahan saat mengambil data konten.');
+        }
       } else if (data === 'help') {
         await sendMessage(chatId, 'Ini adalah panduan bantuan. Gunakan tombol untuk mengakses berbagai fitur.');
       }
