@@ -78,7 +78,7 @@ export async function POST(request) {
 
       // Jika ada sesi aktif
       if (userState) {
-        if (userState.state === 'awaiting_article') {
+        if (userState.state === 'set_artikel') {
           if (text.startsWith('"') && text.includes('|')) {
             const parts = text.split('|').map(part => part.trim());
 
@@ -103,7 +103,7 @@ export async function POST(request) {
           } else {
             await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
           }
-        } else if (userState.state === 'awaiting_token') {
+        } else if (userState.state === 'set_token') {
           if (text.length < 5) { // Misalnya, token harus lebih dari 5 karakter
             await sendMessage(chatId, 'Token tidak valid. Pastikan token memiliki panjang yang benar.');
             return;
@@ -120,10 +120,10 @@ export async function POST(request) {
 
       if (data === 'create_article') {
         await sendMessage(chatId, 'Masukkan data artikel dalam format berikut: \n "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
-        userStateCache.set(chatId, { state: 'awaiting_article' });
+        userStateCache.set(chatId, { state: 'set_artikel' });
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
-        userStateCache.set(chatId, { state: 'awaiting_token' });
+        userStateCache.set(chatId, { state: 'set_token' });
       } else if (data === 'data_content') {
         try {
           const response = await axios.get(`${process.env.BASE_URL}/api/telegram/content_count`);
