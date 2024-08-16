@@ -80,7 +80,7 @@ export async function POST(request) {
           if (text.startsWith('"') && text.includes('|')) {
             const parts = text.split('|').map(part => part.trim());
 
-            if (parts.length !== 3) {
+            if (parts.length !== 4) {
               await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
               return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
             }

@@ -3,11 +3,11 @@ import supabase from '@/app/lib/supabase';
 
 export async function POST(req) {
   try {
-    const { keyword, category, total, lang } = await req.json();
+    const { keyword, category, lang, total  } = await req.json();
 
     if (keyword && category && !isNaN(total)) {
       const { error } = await supabase.from('telegram_articles').insert([
-        { keyword, category, total, lang, status: false, created_at: new Date(), updated_at: new Date() }
+        { keyword, category, lang, total, status: false, created_at: new Date(), updated_at: new Date() }
       ]);
 
       if (error) {
