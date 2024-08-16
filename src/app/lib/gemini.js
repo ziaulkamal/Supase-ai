@@ -1,7 +1,6 @@
 import { getTokenAndUpdateHit } from '@/app/lib/geminiService';
 import axios from 'axios';
 
-// Function to call the Gemini API
 async function callGeminiAPI(prompt) {
     try {
         const { token, endpoint } = await getTokenAndUpdateHit();
@@ -54,7 +53,6 @@ async function callGeminiAPI(prompt) {
     }
 }
 
-// Retry mechanism
 async function retryFunction(fn, retries = 1, delay = 500) {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
@@ -69,13 +67,11 @@ async function retryFunction(fn, retries = 1, delay = 500) {
     }
 }
 
-// Sleep function
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Function to generate session data with retry
-async function generateSessionDataWithRetry(prompt, lang, tone, sessionType, retries = 1) {
+async function generateSessionDataWithRetry(prompt, lang, tone, sessionType, retries = 3) {
     let sessionPrompt;
     switch (sessionType) {
         case 1:
@@ -118,7 +114,6 @@ async function generateSessionDataWithRetry(prompt, lang, tone, sessionType, ret
     return retryFunction(() => fetchSessionData(), retries);
 }
 
-// Function to format session data
 function formatSessionData(response) {
     if (response.candidates && response.candidates.length > 0 &&
         response.candidates[0].content &&
@@ -139,7 +134,6 @@ function formatSessionData(response) {
     }
 }
 
-// Function to convert string to slug
 function stringToSlug(str) {
     return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }

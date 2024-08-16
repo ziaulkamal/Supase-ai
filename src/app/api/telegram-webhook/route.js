@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 
+import { webHookTelegram } from '@/app/lib/supabase';
+
 // Endpoint Telegram API
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}`;
 
@@ -96,18 +98,8 @@ export async function POST(request) {
               return NextResponse.json({ status: 'error', message: 'Total must be a number.' });
             }
 
-            const response = await axios.post(`${process.env.BASE_URL}/api/telegram/articles_data`, {
-              keyword,
-              category,
-              lang,
-              total
-            });
-
-            const responseMessage = response.data.status === 'ok'
-              ? 'Data Anda sudah diproses dan masuk ke jadwal.'
-              : response.data.message;
-
-            await sendMessage(chatId, responseMessage);
+            await webHookTelegram({ keyword, category, lang, total }, 'insert')
+            await sendMessage(chatId, 'Berhasil !, Data akan masuk ke queue untuk di proses');
           } else {
             await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
           }
@@ -117,15 +109,8 @@ export async function POST(request) {
             return;
           }
 
-          const response = await axios.post(`${process.env.BASE_URL}/api/telegram/token_data`, {
-            secretkey: text
-          });
-
-          const responseMessage = response.data.status === 'ok'
-            ? 'Token berhasil ditambahkan.'
-            : response.data.message;
-
-          await sendMessage(chatId, responseMessage);
+          await webHookTelegram(text, 'insertToken');
+          await sendMessage(chatId, 'Berhasil menambahkan Token Baru ');
         }
       } else {
         await sendMessage(chatId, 'Untuk setiap aksi mulai dengan /run dan untuk mengakhiri sesi user /end');

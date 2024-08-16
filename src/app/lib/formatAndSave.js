@@ -1,11 +1,9 @@
 import supabase from '@/app/lib/supabase';
 import { processImages } from '@/app/utils/imageUtils';
 
-// Fungsi untuk menyimpan data ke Supabase
 async function saveToSupabase(result) {
     const { title, slug, articles, category, keywords } = result;
 
-    // Menyimpan data ke tabel articles_ai di Supabase
     const { error } = await supabase
         .from('articles_ai')
         .upsert([
@@ -39,7 +37,6 @@ async function saveImageToSupabase(slug, data) {
     }
 }
 
-// Fungsi untuk memformat dan menyimpan data
 export async function formatAndSaveData(results, category) {
     try {
         const result = {
