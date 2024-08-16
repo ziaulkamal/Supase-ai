@@ -1,4 +1,4 @@
-import { getTokenAndUpdateHit } from '@/app/utils/gemini';
+import { getTokenAndUpdateHit } from '@/app/lib/geminiService';
 import axios from 'axios';
 
 // Function to call the Gemini API
@@ -24,7 +24,7 @@ async function callGeminiAPI(prompt) {
                 generationConfig: {
                     temperature: 0.7,
                     topK: 100,
-                    topP: 42,
+                    topP: 5,
                     maxOutputTokens: 2000,
                     stopSequences: []
                 },

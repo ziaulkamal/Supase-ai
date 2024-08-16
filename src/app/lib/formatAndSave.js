@@ -1,9 +1,9 @@
-import supabase from '@/app/lib/supabaseClient';
+import supabase from '@/app/lib/supabase';
 import { processImages } from '@/app/utils/imageUtils';
 
 // Fungsi untuk menyimpan data ke Supabase
 async function saveToSupabase(result) {
-    const { title, slug, data, keywords } = result;
+    const { title, slug, articles, category, keywords } = result;
 
     // Menyimpan data ke tabel articles_ai di Supabase
     const { error } = await supabase
@@ -12,7 +12,8 @@ async function saveToSupabase(result) {
             {
                 title,
                 slug,
-                data,
+                category,
+                articles,
                 keywords
             }
         ]);
@@ -39,12 +40,13 @@ async function saveImageToSupabase(slug, data) {
 }
 
 // Fungsi untuk memformat dan menyimpan data
-export async function formatAndSaveData(results, prompt) {
+export async function formatAndSaveData(results, category) {
     try {
         const result = {
             title: "",
             slug: "",
-            data: "",
+            category: "",
+            articles: "",
             keywords: ""
         };
 
@@ -62,8 +64,11 @@ export async function formatAndSaveData(results, prompt) {
             if (item.slug) {
                 slug = item.slug;
             }
-            if (item.data) {
-                combinedData.push(item.data);
+            if (item.category) {
+                category = item.category;
+            }
+            if (item.articles) {
+                combinedData.push(item.articles);
             }
             if (item.keywords) {
                 keywords = item.keywords.join(', ');
@@ -72,7 +77,8 @@ export async function formatAndSaveData(results, prompt) {
 
         result.title = title;
         result.slug = slug;
-        result.data = combinedData.join(' ');
+        result.category = category;
+        result.articles = combinedData.join(' ');
         result.keywords = keywords;
 
         await saveToSupabase(result);

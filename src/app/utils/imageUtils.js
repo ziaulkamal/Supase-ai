@@ -1,4 +1,4 @@
-import { scrapeImages } from './googleImageScraper'; // Import sesuai kebutuhan
+import { scrapeImages } from '@/app/lib/googleImageScraper'; // Import sesuai kebutuhan
 
 /**
  * Mengambil gambar berdasarkan kueri pencarian dan mengembalikan data sebagai JSON.
