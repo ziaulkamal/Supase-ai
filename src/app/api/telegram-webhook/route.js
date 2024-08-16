@@ -64,7 +64,7 @@ export async function POST(request) {
       if (text === '/run') {
         await sendMessage(chatId, 'Pilih salah satu opsi:', {
           inline_keyboard: [
-            [{ text: 'Buat Artikel Baru', callback_data: 'create_article' }],
+            [{ text: 'Buat Data Baru', callback_data: 'create_article' }],
             [{ text: 'Tambah Token', callback_data: 'add_token' }],
             [{ text: 'Data Konten', callback_data: 'data_content' }],
             [{ text: 'ℹ️ Bantuan', callback_data: 'help' }]
