@@ -81,13 +81,15 @@ export async function POST(request) {
             const parts = text.split('|').map(part => part.trim());
 
             if (parts.length !== 3) {
-              await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
+              await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
               return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
             }
 
-            const keyword = parts[0].replace(/^"|"$/g, '');
-            const category = parts[1].replace(/^"|"$/g, '');
-            const total = parseInt(parts[2], 10);
+            // Proses setiap bagian sesuai aturan
+            const keyword = parts[0].replace(/^"|"$/g, ''); // Menghapus tanda kutip di awal dan akhir
+            const category = parts[1].replace(/^"|"$/g, ''); // Menghapus tanda kutip di awal dan akhir
+            const lang = parts[2].replace(/^"|"$/g, ''); // Menghapus tanda kutip di awal dan akhir
+            const total = parseInt(parts[3], 10); // Mengonversi total menjadi integer
 
             if (isNaN(total)) {
               await sendMessage(chatId, 'Total harus berupa angka.');
@@ -97,6 +99,7 @@ export async function POST(request) {
             const response = await axios.post(`${process.env.BASE_URL}/api/telegram/articles_data`, {
               keyword,
               category,
+              lang,
               total
             });
 
@@ -106,7 +109,7 @@ export async function POST(request) {
 
             await sendMessage(chatId, responseMessage);
           } else {
-            await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Total');
+            await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
           }
         } else if (userState.state === 'awaiting_token') {
           if (text.length < 5) { // Misalnya, token harus lebih dari 5 karakter
@@ -131,7 +134,7 @@ export async function POST(request) {
       const data = callbackQuery.data;
 
       if (data === 'create_article') {
-        await sendMessage(chatId, 'Masukkan data artikel dalam format berikut: \n "Keyword"|"Category"|Total');
+        await sendMessage(chatId, 'Masukkan data artikel dalam format berikut: \n "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
         userStateCache.set(chatId, { state: 'awaiting_article' });
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
@@ -154,7 +157,7 @@ export async function POST(request) {
 Selamat datang di bot kami! Berikut adalah fitur-fitur yang tersedia:
 
 📝 **Buat Artikel Baru**
-- Klik tombol ini untuk memulai proses pembuatan artikel baru. Kirimkan data artikel dalam format: "Keyword"|"Category"|Total.
+- Klik tombol ini untuk memulai proses pembuatan artikel baru. Kirimkan data artikel dalam format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total.
 - Selama sesi belum di akhiri, maka anda bisa menambah data keyword secara terus menerus sampai sesi di akhiri
 
 
