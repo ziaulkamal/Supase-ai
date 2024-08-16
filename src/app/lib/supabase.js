@@ -220,9 +220,9 @@ async function saveGoogleTrendsData(trendingSearches, geo) {
 async function webHookTelegram(data, type) {
     try {
         if (type === 'insert') {
-            const { keyword, category, lang, total } = data;
-
-            if (!keyword || !category || !lang || total === undefined) {
+            const { keyword, category, language, total } = data;
+            console.log(`Kondisi Ini Bekerja`);
+            if (!keyword || !category || !language || total === undefined) {
                 throw new Error('Invalid data');
             }
 
@@ -232,7 +232,7 @@ async function webHookTelegram(data, type) {
                     {
                         keyword,
                         category,
-                        lang,
+                        language,
                         total,
                         status: false
                     }

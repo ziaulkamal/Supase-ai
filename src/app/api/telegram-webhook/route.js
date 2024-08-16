@@ -90,7 +90,7 @@ export async function POST(request) {
             // Proses setiap bagian sesuai aturan
             const keyword = parts[0].replace(/^"|"$/g, ''); // Menghapus tanda kutip di awal dan akhir
             const category = parts[1].replace(/^"|"$/g, ''); // Menghapus tanda kutip di awal dan akhir
-            const lang = parts[2].replace(/^"|"$/g, ''); // Menghapus tanda kutip di awal dan akhir
+            const language = parts[2].replace(/^"|"$/g, ''); // Menghapus tanda kutip di awal dan akhir
             const total = parseInt(parts[3], 10); // Mengonversi total menjadi integer
 
             if (isNaN(total)) {
@@ -98,7 +98,7 @@ export async function POST(request) {
               return NextResponse.json({ status: 'error', message: 'Total must be a number.' });
             }
 
-            await webHookTelegram({ keyword, category, lang, total }, 'insert')
+            await webHookTelegram({ keyword, category, language, total }, 'insert')
             await sendMessage(chatId, 'Berhasil !, Data akan masuk ke queue untuk di proses');
           } else {
             await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
