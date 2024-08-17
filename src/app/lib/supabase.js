@@ -180,41 +180,52 @@ async function validationGoogleTrends(title) {
     }
 }
 
-async function saveGoogleTrendsData(trendingSearches, geo) {
-    try {
-        for (const search of trendingSearches) {
-            const articles = search.articles || [];
-
-            for (const article of articles) {
-                const { title, url, source = search.image?.source || '', snippet = '' } = article;
-
-                // Cek apakah artikel sudah ada di database
-                const exists = await validationGoogleTrends(title);
-
-                if (!exists) {
-                    // Insert artikel jika belum ada
-                    const { error: insertError } = await supabase
-                        .from('googletrends')
-                        .insert([{
-                            geo,
-                            title,
-                            url,
-                            source,
-                            snippet,
-                            timestamp: new Date()  // Using current timestamp
-                        }]);
-
-                    if (insertError) {
-                        console.error('Error inserting data into Supabase:', insertError);
-                        throw new Error('Error inserting data into database');
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error in saveGoogleTrendsData:', error.message);
-        throw error;
+// Fungsi untuk menyimpan data Google Trends ke Supabase
+async function saveGoogleTrendsData(trendingSearchesDays, geo) {
+  try {
+    // Pastikan data yang diterima adalah array
+    if (!Array.isArray(trendingSearchesDays)) {
+      throw new Error('Trending searches data is not an array');
     }
+
+    // Iterasi setiap hari tren
+    for (const day of trendingSearchesDays) {
+      const { trendingSearches = [] } = day;
+
+      for (const search of trendingSearches) {
+        const { articles = [], image = {} } = search;
+
+        for (const article of articles) {
+          const { title, url, source = image.source || '', snippet = '' } = article;
+
+          // Cek apakah artikel sudah ada di database
+          const exists = await validationGoogleTrends(title);
+
+          if (!exists) {
+            // Insert artikel jika belum ada
+            const { error: insertError } = await supabase
+              .from('googletrends')
+              .insert([{
+                geo,
+                title,
+                url,
+                source,
+                snippet,
+                timestamp: new Date()  // Using current timestamp
+              }]);
+
+            if (insertError) {
+              console.error('Error inserting data into Supabase:', insertError.message);
+              throw new Error('Error inserting data into database');
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error in saveGoogleTrendsData:', error.message);
+    throw error;
+  }
 }
 
 async function webHookTelegram(data, type) {
