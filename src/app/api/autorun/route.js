@@ -11,7 +11,7 @@ export async function GET(request) {
     // Kirimkan request GET ke endpoint /api/google-trends dengan geo dan timestamp sebagai parameter query string
     const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/google-trends`, {
       params: {
-        geo: 'US',
+        geo: 'ID',
         timestamp
       },
       headers: { 

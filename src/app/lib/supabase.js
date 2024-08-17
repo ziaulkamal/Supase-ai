@@ -183,45 +183,44 @@ async function validationGoogleTrends(title) {
 // Fungsi untuk menyimpan data Google Trends ke Supabase
 async function saveGoogleTrendsData(trendingSearchesDays, geo) {
   try {
-    // Pastikan data yang diterima adalah array
-    if (!Array.isArray(trendingSearchesDays)) {
-      throw new Error('Trending searches data is not an array');
-    }
+    // Gabungkan semua artikel dari semua hari ke dalam satu array
+    const allArticles = trendingSearchesDays.flatMap(day =>
+      day.trendingSearches.flatMap(search =>
+        search.articles.map(article => ({
+          title: article.title,
+          url: article.url,
+          source: article.source || search.image?.source || '',
+          snippet: article.snippet || '',
+        }))
+      )
+    );
 
-    // Iterasi setiap hari tren
-    for (const day of trendingSearchesDays) {
-      const { trendingSearches = [] } = day;
-
-      for (const search of trendingSearches) {
-        const { articles = [], image = {} } = search;
-
-        for (const article of articles) {
-          const { title, url, source = image.source || '', snippet = '' } = article;
-
-          // Cek apakah artikel sudah ada di database
-          const exists = await validationGoogleTrends(title);
-
-          if (!exists) {
-            // Insert artikel jika belum ada
-            const { error: insertError } = await supabase
-              .from('googletrends')
-              .insert([{
-                geo,
-                title,
-                url,
-                source,
-                snippet,
-                timestamp: new Date()  // Using current timestamp
-              }]);
-
-            if (insertError) {
-              console.error('Error inserting data into Supabase:', insertError.message);
-              throw new Error('Error inserting data into database');
-            }
-          }
-        }
+    // Buat array promises untuk validasi dan insert data
+    const insertPromises = allArticles.map(async article => {
+      const exists = await validationGoogleTrends(article.title);
+      if (!exists) {
+        return supabase.from('googletrends').insert([{
+          geo,
+          title: article.title,
+          url: article.url,
+          source: article.source,
+          snippet: article.snippet,
+          timestamp: new Date(),  // Menggunakan timestamp saat ini
+        }]);
       }
+    });
+
+    // Eksekusi semua promises secara paralel
+    const results = await Promise.all(insertPromises);
+
+    // Cek error dari hasil insert
+    const errors = results.filter(result => result && result.error);
+    if (errors.length) {
+      errors.forEach(error => console.error('Error inserting data into Supabase:', error.message));
+      throw new Error('Some inserts failed');
     }
+
+    console.log('All data inserted successfully');
   } catch (error) {
     console.error('Error in saveGoogleTrendsData:', error.message);
     throw error;
