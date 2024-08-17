@@ -1,6 +1,7 @@
-// api/autorun/route.js
-
 import { NextResponse } from 'next/server';
+import axios from 'axios';
+
+export const fetchCache = 'default-no-store';
 
 export async function GET(request) {
   try {

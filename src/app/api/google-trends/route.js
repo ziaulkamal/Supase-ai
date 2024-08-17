@@ -3,6 +3,7 @@ import googleTrendsClient from '@/app/lib/googleTrendsClient';
 import { saveGoogleTrendsData } from '@/app/lib/supabase';
 
 let lastTimestamp = Math.floor(Date.now() / 1000);  // Default to current time if not set
+export const fetchCache = 'default-no-store';
 
 export async function GET(request) {
   try {
