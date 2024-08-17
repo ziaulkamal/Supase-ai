@@ -127,7 +127,7 @@ export async function POST(request) {
       } else if (data === 'data_content') {
         try {
           const response = await webHookTelegram(null, 'read');
-          if (response.data.status === 'ok') {
+          if (response.data) {
             const { totalArticles, totalCategories } = response.data;
             await sendMessage(chatId, `Jumlah Artikel: ${totalArticles}\nJumlah Kategori Unik: ${totalCategories}`);
           } else {
