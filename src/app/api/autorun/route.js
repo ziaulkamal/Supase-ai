@@ -9,9 +9,8 @@ export async function GET(request) {
     const timestamp = Math.floor(Date.now() / 1000);
 
     // Buat URL tujuan untuk redirect
-    const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/google-trends`);
-    url.searchParams.append('geo', 'ID');
-    url.searchParams.append('timestamp', timestamp);
+    const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/google-trends?geo=ID&timestamp=${timestamp}`);
+
 
     // Redirect ke endpoint /api/google-trends dengan query string yang sesuai
     const response = NextResponse.redirect(url);
