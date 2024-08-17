@@ -22,7 +22,7 @@ export async function GET(request) {
     // Simpan data tren harian ke Supabase
     await saveGoogleTrendsData(trendsData.default.trendingSearchesDays, geo);
 
-    return NextResponse.json({ status: 'success', message: 'Data fetched and saved successfully' });
+    return NextResponse.json({ status: 'success', message: 'Data fetched and saved successfully', timestamp });
   } catch (error) {
     console.error('Error fetching and saving Google Trends data:', error.message);
     return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
