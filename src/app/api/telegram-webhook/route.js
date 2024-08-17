@@ -114,6 +114,7 @@ export async function POST(request) {
         }else if(userState.state === 'set_count'){
           const response = await webHookTelegram(null, 'read');
           if (response) {
+            console.log(response);
             const { totalArticles, totalCategories } = response;
             await sendMessage(chatId, `Jumlah Artikel: ${totalArticles}\nJumlah Kategori Unik: ${totalCategories}`);
           } else {
