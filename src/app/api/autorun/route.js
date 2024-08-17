@@ -7,9 +7,9 @@ export async function GET(request) {
   try {
     // Menghasilkan timestamp mirip dengan time() di PHP
     const timestamp = Math.floor(Date.now() / 1000);
-
+    const geo = process.env.LANGUAGE;
     // Buat URL tujuan untuk redirect
-    const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/google-trends?geo=ID&timestamp=${timestamp}`);
+    const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/google-trends?geo=${geo}&timestamp=${timestamp}`);
 
 
     // Redirect ke endpoint /api/google-trends dengan query string yang sesuai
