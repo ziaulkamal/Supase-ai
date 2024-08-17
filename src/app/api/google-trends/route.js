@@ -7,7 +7,7 @@ export const fetchCache = 'default-no-store';
 export async function GET(request) {
   try {
     const url = new URL(request.url);
-    const geo = url.searchParams.get('geo') || 'ID';
+    const geo = url.searchParams.get('geo') || process.env.LANGUAGE;
     const timestamp = parseInt(url.searchParams.get('timestamp') || '0', 10);
 
     // Ambil data tren harian
