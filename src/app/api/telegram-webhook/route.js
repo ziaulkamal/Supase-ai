@@ -108,7 +108,7 @@ export async function POST(request) {
             await sendMessage(chatId, 'Token tidak valid. Pastikan token memiliki panjang yang benar.');
             return;
           }
-          console.log(text);
+
           await webHookTelegram({secretkey:text}, 'insertToken');
           await sendMessage(chatId, 'Berhasil menambahkan Token Baru ');
         }
@@ -126,10 +126,10 @@ export async function POST(request) {
         userStateCache.set(chatId, { state: 'set_token' });
       } else if (data === 'data_content') {
         try {
-          const response = await axios.get(`${process.env.BASE_URL}/api/telegram/content_count`);
+          const response = await webHookTelegram(null, 'read');
           if (response.data.status === 'ok') {
-            const { articleCount, categoryCount } = response.data;
-            await sendMessage(chatId, `Jumlah Artikel: ${articleCount}\nJumlah Kategori Unik: ${categoryCount}`);
+            const { totalArticles, totalCategories } = response.data;
+            await sendMessage(chatId, `Jumlah Artikel: ${totalArticles}\nJumlah Kategori Unik: ${totalCategories}`);
           } else {
             await sendMessage(chatId, 'Terjadi kesalahan saat mengambil data konten.');
           }
