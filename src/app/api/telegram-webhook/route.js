@@ -109,7 +109,7 @@ export async function POST(request) {
             return;
           }
           console.log(text);
-          await webHookTelegram(text, 'insertToken');
+          await webHookTelegram({secretkey:text}, 'insertToken');
           await sendMessage(chatId, 'Berhasil menambahkan Token Baru ');
         }
       } else {
