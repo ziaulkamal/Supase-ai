@@ -111,6 +111,14 @@ export async function POST(request) {
 
           await webHookTelegram({secretkey:text}, 'insertToken');
           await sendMessage(chatId, 'Berhasil menambahkan Token Baru ');
+        }else if(userState.state === 'set_count'){
+          const response = await webHookTelegram(null, 'read');
+          if (response) {
+            const { totalArticles, totalCategories } = response;
+            await sendMessage(chatId, `Jumlah Artikel: ${totalArticles}\nJumlah Kategori Unik: ${totalCategories}`);
+          } else {
+            await sendMessage(chatId, 'Terjadi kesalahan saat mengambil data konten.');
+          }
         }
       } else {
         await sendMessage(chatId, 'Untuk setiap aksi mulai dengan /run dan untuk mengakhiri sesi user /end');
