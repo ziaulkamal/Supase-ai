@@ -197,3 +197,10 @@ _Untuk bantuan lebih lanjut, gunakan tombol bantuan atau kirimkan pesan jika And
     return NextResponse.json({ status: 'error', message: 'Internal server error.' });
   }
 }
+
+
+export async function GET(){
+    const url = `${TELEGRAM_API_URL}/setWebhook?url=${process.env.NEXT_PUBLIC_BASE_URL}/telegram-webhook`
+    const response = await axios.get(url)
+    return NextResponse.json(response);
+}
