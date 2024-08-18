@@ -199,3 +199,15 @@ _Untuk bantuan lebih lanjut, gunakan tombol bantuan atau kirimkan pesan jika And
 }
 
 
+export async function GET() {
+    try {
+        const url = `${TELEGRAM_API_URL}/setWebhook?url=${process.env.NEXT_PUBLIC_BASE_URL}/telegram-webhook`;
+
+        // Mengembalikan respons data dari axios
+        return NextResponse.json(`Visit this url for Start Webhook : \n ${url}`);
+    } catch (error) {
+        // Menangani error dan mengembalikan status error jika permintaan gagal
+        console.error('Error fetching webhook:', error);
+        return NextResponse.json({ error: 'Failed to set webhook' }, { status: 500 });
+    }
+}
