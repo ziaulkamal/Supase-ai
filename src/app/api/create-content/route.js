@@ -5,9 +5,7 @@ export async function GET(request) {
     // Ambil query parameters
     const id = url.searchParams.get('id');
     const type = url.searchParams.get('type');
-
-    // Ambil timestamp dari path
-    const timestamp = url.pathname.split('/').pop(); // Mengambil 'timestamp' dari URL path
+    const timestamp = url.searchParams.get('timestamp');
 
     // Validasi id, type, dan timestamp
     if (!id || !type || !timestamp) {
