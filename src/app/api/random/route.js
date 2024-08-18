@@ -38,7 +38,7 @@ export async function GET() {
         // Pastikan id dan type valid
         if (id && type) {
             // Arahkan data ke endpoint create-content
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/${id}/${type}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/create-content/${id}/${type}`, {
                 method: 'GET', // Menggunakan metode GET
                 headers: {
                     'Content-Type': 'application/json'
