@@ -38,15 +38,26 @@ export async function GET() {
     // Pastikan id dan type valid
     if (id && type) {
         // Redirect langsung ke endpoint create-content dengan format baru
-        return Response.redirect(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/create-content/${timestamp}?id=${id}&type=${type}`,
-            302
+        return new Response(
+            JSON.stringify({
+                redirect: `${process.env.NEXT_PUBLIC_BASE_URL}/api/create-content/${timestamp}?id=${id}&type=${type}`
+            }),
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-store' // Mencegah caching
+                },
+                status: 302
+            }
         );
     } else {
         return new Response(
             JSON.stringify({ error: 'No data available to redirect' }),
             {
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-store' // Mencegah caching
+                },
                 status: 404
             }
         );

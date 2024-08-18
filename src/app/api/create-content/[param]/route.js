@@ -14,7 +14,10 @@ export async function GET(request) {
         return new Response(
             JSON.stringify({ error: 'ID, type, and timestamp are required' }),
             {
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-store' // Mencegah caching
+                },
                 status: 400
             }
         );
@@ -36,7 +39,10 @@ export async function GET(request) {
             timestamp
         }),
         {
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store' // Mencegah caching
+            },
             status: 200
         }
     );
