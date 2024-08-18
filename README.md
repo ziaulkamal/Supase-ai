@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Schématique
+
+Schématique is a powerful tool designed for automating content creation and scheduling. It integrates various functionalities to streamline your content management processes. 
+
+## Features
+
+- 📅 **Auto Create Content Schedule**  
+  Automatically generate and manage your content calendar.
+
+- 📝 **Content Generate By Keyword**  
+  Create content based on specific keywords to enhance relevance and SEO.
+
+- 🌐 **Content Generate By Google Trends**  
+  Generate content ideas and topics based on current Google Trends.
+
+- 🖼️ **Image Source From Search Engine**  
+  Source images directly from search engines to complement your content.
+
+- 🚀 **Running On Vercel And Self Hosted**  
+  Deploy your application on Vercel for ease of use or host it on your own server.
+
+- 🔄 **Set And Forget Method**  
+  Configure the tool once and let it run automatically with minimal intervention.
+
+- 📲 **Control Using Telegram**  
+  Manage and control your content creation and scheduling via Telegram for convenience.
 
 ## Getting Started
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-curl -X POST "https://api.telegram.org/bot7429366317:AAG-bBFwJcEby0pZ-eyoZv2TPgXmdqEWSLY/setWebhook?url=https://supase-ai.vercel.app/api/telegram-webhook"
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+To get started with Schématique, follow these steps:
