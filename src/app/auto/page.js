@@ -6,7 +6,7 @@ import axios from 'axios';
 async function fetchGoogleTrendsData(geo, timestamp) {
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/google-trends?geo=${geo}&timestamp=${timestamp}`);
-    console.log(response);
+
     return response.data;  // Pastikan untuk mengembalikan data yang relevan
   } catch (error) {
     console.error('Error in fetchGoogleTrendsData:', error.message);
@@ -25,16 +25,15 @@ const Auto = () => {
     const fetchDataAndRedirect = async () => {
       const data = await fetchGoogleTrendsData(geo, timestamp);
       // Tampilkan data di konsol untuk debugging
-      console.log(data);
 
       // Melakukan redirect
-      window.location.href = redirectUrl;
+      window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/api/google-trends?geo=${geo}&timestamp=${timestamp}`;
     };
 
     fetchDataAndRedirect();
   }, []);
 
-  return <p>Redirecting...</p>;
+  return;
 };
 
 export default Auto;
