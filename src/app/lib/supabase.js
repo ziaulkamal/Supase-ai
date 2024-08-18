@@ -5,6 +5,42 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+async function getSettings() {
+    try {
+        // Cek apakah data sudah ada
+        const { data: existingSettings, error: fetchError } = await supabase
+            .from('settings')
+            .select('bygoogles, bykeywords') // Pilih kolom yang diinginkan
+            .single(); // Ambil satu baris saja
+
+        if (fetchError) {
+            throw new Error('Error Fetching Settings: ' + fetchError.message);
+        }
+
+        if (!existingSettings) {
+            // Jika data belum ada, tambahkan baris default
+            const { data: insertedData, error: insertError } = await supabase
+                .from('settings')
+                .insert([{ bygoogles: false, bykeywords: true, updated_at: new Date() }])
+                .single(); // Ambil data yang baru saja dimasukkan
+
+            if (insertError) {
+                throw new Error('Error Inserting Default Settings: ' + insertError.message);
+            }
+
+            // Kembalikan data yang baru ditambahkan
+            return { bygoogles: insertedData.bygoogles, bykeywords: insertedData.bykeywords };
+        }
+
+        // Kembalikan data yang diambil
+        return { bygoogles: existingSettings.bygoogles, bykeywords: existingSettings.bykeywords };
+    } catch (error) {
+        console.error('Error in getSettings function:', error);
+        throw error; // Re-throw error to propagate it up
+    }
+}
+
+
 async function saveArticle(result) {
     const { title, slug, category, articles, keywords } = result;
     const { error } = await supabase
@@ -220,7 +256,6 @@ async function saveGoogleTrendsData(trendingSearchesDays, geo) {
       throw new Error('Some inserts failed');
     }
 
-    console.log('All data inserted successfully');
   } catch (error) {
     console.error('Error in saveGoogleTrendsData:', error.message);
     throw error;
@@ -231,7 +266,6 @@ async function webHookTelegram(data, type) {
     try {
         if (type === 'insert') {
             const { keyword, category, language, total } = data;
-            console.log(`Kondisi Ini Bekerja`);
             if (!keyword || !category || !language || total === undefined) {
                 throw new Error('Invalid data');
             }
@@ -276,10 +310,102 @@ async function webHookTelegram(data, type) {
     }
 }
 
+async function getRandomIdeas() {
+    try {
+        // Ambil data dengan status false dan total tertinggi
+        const { data: ideas, error: fetchError } = await supabase
+            .from('ideas')
+            .select('*')
+            .eq('status', false)
+            .order('total', { ascending: false }) // Urutkan berdasarkan total tertinggi
+            .limit(1); // Ambil satu baris
+
+        if (fetchError) {
+            throw new Error('Error Fetching Ideas: ' + fetchError.message);
+        }
+
+        if (ideas.length === 0) {
+            // Tidak ada ide dengan status false
+            return null;
+        }
+
+        const idea = ideas[0]; // Ambil baris pertama dari hasil
+
+        const updatedTotal = idea.total - 1;
+
+        // Update ide jika total sudah 0
+        const { error: updateError } = await supabase
+            .from('ideas')
+            .update({
+                total: updatedTotal,
+                status: updatedTotal <= 0 ? true : false, // Set status ke true jika total <= 0
+                updated_at: new Date() // Set updated_at ke waktu saat ini
+            })
+            .eq('id', idea.id);
+
+        if (updateError) {
+            throw new Error('Error Updating Idea: ' + updateError.message);
+        }
+
+        // Kembalikan ide yang diambil
+        return idea;
+
+    } catch (error) {
+        console.error('Error in getRandomIdeas function:', error);
+        throw error; // Re-throw error to propagate it up
+    }
+}
+
+async function getRandomGoogle() {
+    try {
+        // Ambil data dengan status false
+        const { data: googleTrends, error: fetchError } = await supabase
+            .from('googletrends')
+            .select('*')
+            .eq('status', false)
+            .order('timestamp', { ascending: true }) // Urutkan berdasarkan timestamp
+            .limit(1); // Ambil satu baris
+
+        if (fetchError) {
+            throw new Error('Error Fetching Google Trend: ' + fetchError.message);
+        }
+
+        if (googleTrends.length === 0) {
+            // Tidak ada tren Google dengan status false
+            return null;
+        }
+
+        const trend = googleTrends[0]; // Ambil baris pertama dari hasil
+
+        // Update status menjadi true setelah data diambil
+        const { error: updateError } = await supabase
+            .from('googletrends')
+            .update({
+                status: true,
+                timestamp: new Date() // Update timestamp ke waktu saat ini
+            })
+            .eq('id', trend.id);
+
+        if (updateError) {
+            throw new Error('Error Updating Google Trend Status: ' + updateError.message);
+        }
+
+        // Kembalikan data yang diambil
+        return trend;
+
+    } catch (error) {
+        console.error('Error in getRandomGoogle function:', error);
+        throw error; // Re-throw error to propagate it up
+    }
+}
+
 export {
     saveArticle,
     saveImage,
     getAndHitToken,
     webHookTelegram,
-    saveGoogleTrendsData
+    saveGoogleTrendsData,
+    getSettings,
+    getRandomIdeas,
+    getRandomGoogle 
 };
