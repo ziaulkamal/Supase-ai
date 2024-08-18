@@ -16,7 +16,7 @@ export async function GET(request) {
             {
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Cache-Control': 'no-store' // Mencegah caching
+                    'Cache-Control': 's-maxage=1, stale-while-revalidate=0' // Mencegah caching
                 },
                 status: 400
             }
@@ -41,7 +41,7 @@ export async function GET(request) {
         {
             headers: { 
                 'Content-Type': 'application/json',
-                'Cache-Control': 'no-store' // Mencegah caching
+                'Cache-Control': 's-maxage=1, stale-while-revalidate=0' // Mencegah caching
             },
             status: 200
         }

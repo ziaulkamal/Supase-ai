@@ -40,12 +40,12 @@ export async function GET() {
         // Redirect langsung ke endpoint create-content dengan format baru
         return new Response(
             JSON.stringify({
-                redirect: `${process.env.NEXT_PUBLIC_BASE_URL}/api/create-content/${timestamp}?id=${id}&type=${type}`
+                redirect: `${process.env.NEXT_PUBLIC_BASE_URL}/api/create-content/timestamp?id=${id}&type=${type}`
             }),
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Cache-Control': 'no-store' // Mencegah caching
+                    'Cache-Control': 's-maxage=1, stale-while-revalidate=0' // Mencegah caching
                 },
                 status: 302
             }
@@ -56,7 +56,7 @@ export async function GET() {
             {
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Cache-Control': 'no-store' // Mencegah caching
+                    'Cache-Control': 's-maxage=1, stale-while-revalidate=0' // Mencegah caching
                 },
                 status: 404
             }
