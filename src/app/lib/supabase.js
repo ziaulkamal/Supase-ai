@@ -1,77 +1,82 @@
 import { createClient } from '@supabase/supabase-js';
+import { processImages } from '../utils/imageUtils';
 
-// Gantilah dengan URL dan kunci API dari proyek Supabase Anda
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function getSettings() {
     try {
-        // Cek apakah data sudah ada
         const { data: existingSettings, error: fetchError } = await supabase
             .from('settings')
-            .select('bygoogles, bykeywords') // Pilih kolom yang diinginkan
-            .single(); // Ambil satu baris saja
+            .select('bygoogles, bykeywords')
+            .single();
 
         if (fetchError) {
             throw new Error('Error Fetching Settings: ' + fetchError.message);
         }
 
         if (!existingSettings) {
-            // Jika data belum ada, tambahkan baris default
             const { data: insertedData, error: insertError } = await supabase
                 .from('settings')
                 .insert([{ bygoogles: false, bykeywords: true, updated_at: new Date() }])
-                .single(); // Ambil data yang baru saja dimasukkan
+                .single();
 
             if (insertError) {
                 throw new Error('Error Inserting Default Settings: ' + insertError.message);
             }
 
-            // Kembalikan data yang baru ditambahkan
             return { bygoogles: insertedData.bygoogles, bykeywords: insertedData.bykeywords };
         }
 
-        // Kembalikan data yang diambil
         return { bygoogles: existingSettings.bygoogles, bykeywords: existingSettings.bykeywords };
     } catch (error) {
-        console.error('Error in getSettings function:', error);
-        throw error; // Re-throw error to propagate it up
+        console.error('Error in getSettings function:', error.message);
+        throw error;
     }
 }
 
-
 async function saveArticle(result) {
     const { title, slug, category, articles, keywords } = result;
-    const { error } = await supabase
-        .from('articles_ai')
-        .upsert([
-            {
-                title,
-                slug,
-                category,
-                articles,
-                keywords
-            }
-        ]);
+    try {
+        const { error } = await supabase
+            .from('articles_ai')
+            .upsert([
+                {
+                    title,
+                    slug,
+                    category,
+                    articles,
+                    keywords
+                }
+            ]);
 
-    if (error) {
-        throw new Error('Error Saving Article');
+        if (error) {
+            throw new Error('Error Saving Article: ' + error.message);
+        }
+    } catch (error) {
+        console.error('Error in saveArticle:', error.message);
+        throw error;
     }
 }
 
 async function saveImage(slug, data) {
-    const { error } = await supabase
-        .from('images_ai')
-        .upsert([
-            {
-                slug,
-                images_data: data,
-            }
-        ]);
+    try {
+        const { error } = await supabase
+            .from('images_ai')
+            .upsert([
+                {
+                    slug,
+                    images_data: data,
+                }
+            ]);
 
-    if (error) {
-        throw new Error('Error saving to Supabase');
+        if (error) {
+            throw new Error('Error saving to Supabase: ' + error.message);
+        }
+    } catch (error) {
+        console.error('Error in saveImage:', error.message);
+        throw error;
     }
 }
 
@@ -97,7 +102,7 @@ async function getAndHitToken() {
             .eq('id', tokenId);
 
         if (updateError) {
-            throw new Error(updateError.message);
+            throw new Error('Error updating token hit count: ' + updateError.message);
         }
 
         return {
@@ -105,9 +110,9 @@ async function getAndHitToken() {
             endpoint: tokenData.url_endpoint,
             status: 'success'
         };
-
     } catch (error) {
-        throw new Error(error.message);
+        console.error('Error in getAndHitToken:', error.message);
+        throw error;
     }
 }
 
@@ -128,18 +133,17 @@ async function insertToken(secretkey) {
             ]);
 
         if (error) {
-            throw new Error('Error inserting token into Supabase');
+            throw new Error('Error inserting token into Supabase: ' + error.message);
         }
-
     } catch (error) {
         console.error('Error in insertToken:', error.message);
         throw error;
     }
 }
 
-async function insertArticles(result) {
+async function insertArticles(result, category) {
     try {
-        const { title, slug, category, articles, keywords } = result;
+        const { title, slug, articles, keywords } = result;
 
         const { error } = await supabase
             .from('articles_ai')
@@ -154,9 +158,12 @@ async function insertArticles(result) {
             ]);
 
         if (error) {
-            throw new Error('Error Saving Article');
+            throw new Error('Error Saving Article: ' + error.message);
         }
 
+        const imageJson = await processImages(slug, 20);
+        await saveImage(slug, imageJson);
+        return 'success';
     } catch (error) {
         console.error('Error in insertArticles:', error.message);
         throw error;
@@ -170,7 +177,7 @@ async function countArticles() {
             .select('*', { count: 'exact' });
 
         if (articlesError) {
-            throw new Error('Error fetching article count');
+            throw new Error('Error fetching article count: ' + articlesError.message);
         }
 
         const { data: categoriesData, error: categoriesError } = await supabase
@@ -178,7 +185,7 @@ async function countArticles() {
             .select('category');
 
         if (categoriesError) {
-            throw new Error('Error fetching categories');
+            throw new Error('Error fetching categories: ' + categoriesError.message);
         }
 
         const uniqueCategories = new Set(categoriesData.map(row => row.category));
@@ -188,7 +195,6 @@ async function countArticles() {
             totalArticles,
             totalCategories
         };
-
     } catch (error) {
         console.error('Error in countArticles:', error.message);
         throw error;
@@ -203,63 +209,55 @@ async function validationGoogleTrends(title) {
             .eq('title', title)
             .single();
 
-        if (selectError && selectError.code !== 'PGRST116') {  // Check for specific 'not found' error
-            console.error('Error checking existing title:', selectError);
-            throw new Error('Error checking existing title');
+        if (selectError && selectError.code !== 'PGRST116') {
+            throw new Error('Error checking existing title: ' + selectError.message);
         }
 
-        return !!existingArticle;  // Return true if exists, false otherwise
-
+        return !!existingArticle;
     } catch (error) {
-        console.error('Error in checkIfExists:', error.message);
+        console.error('Error in validationGoogleTrends:', error.message);
         throw error;
     }
 }
 
-// Fungsi untuk menyimpan data Google Trends ke Supabase
 async function saveGoogleTrendsData(trendingSearchesDays, geo) {
-  try {
-    // Gabungkan semua artikel dari semua hari ke dalam satu array
-    const allArticles = trendingSearchesDays.flatMap(day =>
-      day.trendingSearches.flatMap(search =>
-        search.articles.map(article => ({
-          title: article.title,
-          url: article.url,
-          source: article.source || search.image?.source || '',
-          snippet: article.snippet || '',
-        }))
-      )
-    );
+    try {
+        const allArticles = trendingSearchesDays.flatMap(day =>
+            day.trendingSearches.flatMap(search =>
+                search.articles.map(article => ({
+                    title: article.title,
+                    url: article.url,
+                    source: article.source || search.image?.source || '',
+                    snippet: article.snippet || '',
+                }))
+            )
+        );
 
-    // Buat array promises untuk validasi dan insert data
-    const insertPromises = allArticles.map(async article => {
-      const exists = await validationGoogleTrends(article.title);
-      if (!exists) {
-        return supabase.from('googletrends').insert([{
-          geo,
-          title: article.title,
-          url: article.url,
-          source: article.source,
-          snippet: article.snippet,
-          timestamp: new Date(),  // Menggunakan timestamp saat ini
-        }]);
-      }
-    });
+        const insertPromises = allArticles.map(async article => {
+            const exists = await validationGoogleTrends(article.title);
+            if (!exists) {
+                return supabase.from('googletrends').insert([{
+                    geo,
+                    title: article.title,
+                    url: article.url,
+                    source: article.source,
+                    snippet: article.snippet,
+                    timestamp: new Date(),
+                }]);
+            }
+        });
 
-    // Eksekusi semua promises secara paralel
-    const results = await Promise.all(insertPromises);
+        const results = await Promise.all(insertPromises);
 
-    // Cek error dari hasil insert
-    const errors = results.filter(result => result && result.error);
-    if (errors.length) {
-      errors.forEach(error => console.error('Error inserting data into Supabase:', error.message));
-      throw new Error('Some inserts failed');
+        const errors = results.filter(result => result && result.error);
+        if (errors.length) {
+            errors.forEach(error => console.error('Error inserting data into Supabase:', error.message));
+            throw new Error('Some inserts failed');
+        }
+    } catch (error) {
+        console.error('Error in saveGoogleTrendsData:', error.message);
+        throw error;
     }
-
-  } catch (error) {
-    console.error('Error in saveGoogleTrendsData:', error.message);
-    throw error;
-  }
 }
 
 async function webHookTelegram(data, type) {
@@ -283,9 +281,8 @@ async function webHookTelegram(data, type) {
                 ]);
 
             if (error) {
-                throw new Error('Error saving data to Supabase');
+                throw new Error('Error saving data to Supabase: ' + error.message);
             }
-
         } else if (type === 'read') {
             return await countArticles();
         } else if (type === 'insertToken') {
@@ -296,14 +293,11 @@ async function webHookTelegram(data, type) {
             }
 
             await insertToken(secretkey);
-
         } else if (type === 'insertArticles') {
             await insertArticles(data);
-
         } else {
             throw new Error('Invalid type');
         }
-
     } catch (error) {
         console.error('Error in webHookTelegram:', error.message);
         throw error;
@@ -312,34 +306,31 @@ async function webHookTelegram(data, type) {
 
 async function getRandomIdeas() {
     try {
-        // Ambil data dengan status false dan total tertinggi
         const { data: ideas, error: fetchError } = await supabase
             .from('ideas')
             .select('*')
             .eq('status', false)
-            .order('total', { ascending: false }) // Urutkan berdasarkan total tertinggi
-            .limit(1); // Ambil satu baris
+            .order('total', { ascending: false })
+            .limit(1);
 
         if (fetchError) {
             throw new Error('Error Fetching Ideas: ' + fetchError.message);
         }
 
         if (ideas.length === 0) {
-            // Tidak ada ide dengan status false
             return null;
         }
 
-        const idea = ideas[0]; // Ambil baris pertama dari hasil
+        const idea = ideas[0];
 
         const updatedTotal = idea.total - 1;
 
-        // Update ide jika total sudah 0
         const { error: updateError } = await supabase
             .from('ideas')
             .update({
                 total: updatedTotal,
-                status: updatedTotal <= 0 ? true : false, // Set status ke true jika total <= 0
-                updated_at: new Date() // Set updated_at ke waktu saat ini
+                status: updatedTotal <= 0 ? true : false,
+                updated_at: new Date()
             })
             .eq('id', idea.id);
 
@@ -347,42 +338,37 @@ async function getRandomIdeas() {
             throw new Error('Error Updating Idea: ' + updateError.message);
         }
 
-        // Kembalikan ide yang diambil
         return idea;
-
     } catch (error) {
-        console.error('Error in getRandomIdeas function:', error);
-        throw error; // Re-throw error to propagate it up
+        console.error('Error in getRandomIdeas:', error.message);
+        throw error;
     }
 }
 
 async function getRandomGoogle() {
     try {
-        // Ambil data dengan status false
         const { data: googleTrends, error: fetchError } = await supabase
             .from('googletrends')
             .select('*')
             .eq('status', false)
-            .order('timestamp', { ascending: true }) // Urutkan berdasarkan timestamp
-            .limit(1); // Ambil satu baris
+            .order('timestamp', { ascending: true })
+            .limit(1);
 
         if (fetchError) {
             throw new Error('Error Fetching Google Trend: ' + fetchError.message);
         }
 
         if (googleTrends.length === 0) {
-            // Tidak ada tren Google dengan status false
             return null;
         }
 
-        const trend = googleTrends[0]; // Ambil baris pertama dari hasil
+        const trend = googleTrends[0];
 
-        // Update status menjadi true setelah data diambil
         const { error: updateError } = await supabase
             .from('googletrends')
             .update({
                 status: true,
-                timestamp: new Date() // Update timestamp ke waktu saat ini
+                timestamp: new Date()
             })
             .eq('id', trend.id);
 
@@ -390,12 +376,62 @@ async function getRandomGoogle() {
             throw new Error('Error Updating Google Trend Status: ' + updateError.message);
         }
 
-        // Kembalikan data yang diambil
         return trend;
-
     } catch (error) {
-        console.error('Error in getRandomGoogle function:', error);
-        throw error; // Re-throw error to propagate it up
+        console.error('Error in getRandomGoogle:', error.message);
+        throw error;
+    }
+}
+
+async function getSingleDatas(id, type) {
+    let prompt, lang, category;
+
+    try {
+        switch (type) {
+            case 'keyword':
+                const { data: keywordData, error: keywordError } = await supabase
+                    .from('ideas')
+                    .select('keyword, category, language')
+                    .eq('id', id)
+                    .single();
+
+                if (keywordError) {
+                    throw new Error('Error fetching keyword data: ' + keywordError.message);
+                }
+
+                if (keywordData) {
+                    prompt = keywordData.keyword;
+                    lang = keywordData.language;
+                    category = keywordData.category;
+                }
+                break;
+
+            case 'google':
+                const { data: googleData, error: googleError } = await supabase
+                    .from('googletrends')
+                    .select('title, geo, source')
+                    .eq('id', id)
+                    .single();
+
+                if (googleError) {
+                    throw new Error('Error fetching google trends data: ' + googleError.message);
+                }
+
+                if (googleData) {
+                    prompt = googleData.title.endsWith('...') ? googleData.title.slice(0, -3) : googleData.title;
+                    lang = googleData.geo;
+                    category = googleData.source;
+                }
+                break;
+
+            default:
+                throw new Error('Invalid type provided');
+        }
+
+        return { prompt, lang, category };
+    } catch (error) {
+        console.error('Error in getSingleDatas:', error.message);
+        throw error;
     }
 }
 
@@ -407,5 +443,7 @@ export {
     saveGoogleTrendsData,
     getSettings,
     getRandomIdeas,
-    getRandomGoogle 
+    getRandomGoogle,
+    getSingleDatas,
+    insertArticles
 };

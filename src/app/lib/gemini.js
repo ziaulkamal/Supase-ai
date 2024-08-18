@@ -1,9 +1,9 @@
-import { getTokenAndUpdateHit } from '@/app/lib/geminiService';
 import axios from 'axios';
+import { getAndHitToken } from './supabase';
 
 async function callGeminiAPI(prompt) {
     try {
-        const { token, endpoint } = await getTokenAndUpdateHit();
+        const { token, endpoint } = await getAndHitToken();
 
         const API_KEY = token;
         const API_URL = endpoint;
@@ -23,8 +23,8 @@ async function callGeminiAPI(prompt) {
                 generationConfig: {
                     temperature: 0.7,
                     topK: 100,
-                    topP: 5,
-                    maxOutputTokens: 2000,
+                    topP: 1,
+                    maxOutputTokens: 1300,
                     stopSequences: []
                 },
                 safetySettings: [
