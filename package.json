@@ -1,7 +1,8 @@
 {
-  "name": "supsai",
+  "name": "schematique",
   "version": "0.1.0",
   "private": true,
+  "description": "A tool for auto-creating content schedules, generating content by keywords and Google Trends, sourcing images from search engines, with support for self-hosting and control via Telegram.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
