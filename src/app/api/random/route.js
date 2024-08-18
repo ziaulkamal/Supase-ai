@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { getSettings, getRandomIdeas, getRandomGoogle } from '@/app/lib/supabase'; // Pastikan path sesuai dengan lokasi file Anda
 
-export async function GET() {
+export async function GET(request) {
     // Ambil pengaturan dari tabel
+    const url = new URL(request.url);
+    const getTimeStamp = url.searchParams.get('timestamp');
     const settings = await getSettings();
     const timestamp = Math.floor(Date.now() / 1000);
 
