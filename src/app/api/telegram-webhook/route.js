@@ -204,7 +204,7 @@ export async function GET() {
         const url = `${TELEGRAM_API_URL}/setWebhook?url=${process.env.NEXT_PUBLIC_BASE_URL}/telegram-webhook`;
 
         // Mengembalikan respons data dari axios
-        return NextResponse.json(`Visit this url for Start Webhook : \n ${url}`);
+        return NextResponse.redirect(url);
     } catch (error) {
         // Menangani error dan mengembalikan status error jika permintaan gagal
         console.error('Error fetching webhook:', error);
