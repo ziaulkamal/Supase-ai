@@ -48,3 +48,33 @@ To get started with Schématique, follow these steps:
     NEXT_PUBLIC_BASE_URL=http://localhost:3000
     LANGUAGE=US
     ```
+    
+### Setting Up Environment Variables in Vercel
+
+1. **Log in to Vercel**
+   - Go to the [Vercel Dashboard](https://vercel.com/dashboard) and log in to your account.
+
+2. **Select Your Project**
+   - Choose the project you want to configure from the list.
+
+3. **Go to Project Settings**
+   - Click on the project name to open the project page.
+   - Select the **Settings** tab at the top of the page.
+
+4. **Navigate to Environment Variables**
+   - On the left sidebar, click on **Environment Variables**. This will open the page where you can add and manage environment variables.
+
+5. **Add Environment Variables**
+   - Click on the **Add** button to create a new environment variable.
+   - Enter the following details:
+     - **Name:** The name of the environment variable, e.g., `NEXT_PUBLIC_SUPABASE_URL`.
+     - **Value:** The value of the environment variable, e.g., `https://your-supabase-url.supabase.co`.
+     - **Environment:** Select where the variable will be used:
+       - **Development:** For the development environment.
+       - **Preview:** For the preview environment.
+       - **Production:** For the production environment.
+   - Click **Add** to save the environment variable.
+
+6. **Review and Save**
+   - Ensure all variables are correct.
+   - Vercel will automatically apply these changes. You may need to redeploy your application for the changes to take effect.
