@@ -16,7 +16,7 @@ export default function RandomPage() {
             'Expires': '0'
           }
         });
-
+        console.log(`Task Running at ${timestamp}`);
         if (response.status === 200) {
           const { id, type } = response.data; // Asumsikan respons mengandung id dan type
           window.location.href = `/api/create-content?id=${id}&type=${type}&timestamp=${timestamp}`;
