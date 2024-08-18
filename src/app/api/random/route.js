@@ -5,6 +5,11 @@ export async function GET() {
     const settings = await getSettings();
     const timestamp = Math.floor(Date.now() / 1000);
 
+    // Simpan data dalam variabel
+    const settingsData = {
+        google: settings.bygoogles,
+        keyword: settings.bykeywords
+    };
 
     let id;
     let type;
@@ -30,6 +35,20 @@ export async function GET() {
         }
     }
 
-    return Response.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/api/create-content/${id}/${type}?timestamp=${timestamp}`, 302);
+    // Pastikan id dan type valid
+    if (id && type) {
+        // Redirect langsung ke endpoint create-content dengan format baru
+        return Response.redirect(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/create-content/${timestamp}?id=${id}&type=${type}`,
+            302
+        );
+    } else {
+        return new Response(
+            JSON.stringify({ error: 'No data available to redirect' }),
+            {
+                headers: { 'Content-Type': 'application/json' },
+                status: 404
+            }
+        );
+    }
 }
-
