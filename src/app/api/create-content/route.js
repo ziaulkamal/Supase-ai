@@ -1,5 +1,6 @@
 import { generateSessionDataWithRetry, formatSessionData } from "@/app/lib/gemini";
 import { getSingleDatas, insertArticles } from "@/app/lib/supabase";
+import { cleanFormat } from "@/app/utils/formatJson";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
@@ -50,7 +51,8 @@ export async function GET(request) {
             results[`session_${sessionType}`] = formatSessionData(response);
         }
 
-        const letsInsert = await insertArticles(results, category);
+        const makeFormat = await cleanFormat(results, category);
+        const letsInsert = await insertArticles(makeFormat);
 
         return NextResponse.json(letsInsert, {
             status: 200,

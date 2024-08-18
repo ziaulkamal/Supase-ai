@@ -67,7 +67,7 @@ async function saveImage(slug, data) {
             .upsert([
                 {
                     slug,
-                    images_data: data,
+                    image_data: data,
                 }
             ]);
 
@@ -141,9 +141,22 @@ async function insertToken(secretkey) {
     }
 }
 
-async function insertArticles(result, category) {
+async function insertArticles(result) {
     try {
-        const { title, slug, articles, keywords } = result;
+        const { title, slug, category, data, keywords } = result;
+
+                // Check which fields are missing
+        let missingFields = [];
+        if (!slug) missingFields.push('slug');
+        if (!title) missingFields.push('title');
+        if (!category) missingFields.push('category');
+        if (!data) missingFields.push('data');
+        if (!keywords) missingFields.push('keywords');
+
+        // If any fields are missing, throw an error
+        if (missingFields.length > 0) {
+            throw new Error('Missing required fields: ' + missingFields.join(', '));
+        }
 
         const { error } = await supabase
             .from('articles_ai')
@@ -152,7 +165,7 @@ async function insertArticles(result, category) {
                     title,
                     slug,
                     category,
-                    articles,
+                    data,
                     keywords
                 }
             ]);
@@ -169,6 +182,7 @@ async function insertArticles(result, category) {
         throw error;
     }
 }
+
 
 async function countArticles() {
     try {

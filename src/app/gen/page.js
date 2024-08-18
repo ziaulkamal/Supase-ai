@@ -2,34 +2,16 @@
 'use client'; // Untuk client-side rendering
 
 import { useEffect } from 'react';
-import axios from 'axios';
 
 export default function RandomPage() {
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const timestamp = Math.floor(Date.now() / 1000);
-        const response = await axios.get(`/api/random?timestamp=${timestamp}`, {
-          headers: {
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
-        console.log(`Task Running at ${timestamp}`);
-        if (response.status === 200) {
-          const { id, type } = response.data; // Asumsikan respons mengandung id dan type
-          window.location.href = `/api/create-content?id=${id}&type=${type}&timestamp=${timestamp}`;
-        } else {
-          // Tangani jika status bukan 200
-          console.error('Error:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error:', error.message);
-      }
+    const redirectImmediately = () => {
+      const timestamp = Math.floor(Date.now() / 1000);
+      // Langsung redirect ke URL tanpa menunggu respon axios
+      window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/api/random?timestamp=${timestamp}`;
     };
 
-    fetchData();
+    redirectImmediately();
   }, []);
 
   return <div>Redirecting...</div>;
