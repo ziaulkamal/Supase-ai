@@ -28,3 +28,23 @@ Schématique is a powerful tool designed for automating content creation and sch
 ## Getting Started
 
 To get started with Schématique, follow these steps:
+1. **Clone the Repository**  
+   ```bash
+   git clone https://github.com/yourusername/schematique.git
+   cd schematique
+   ```
+2. **Install Dependencies**  
+    ```bash
+    npm install
+    ```
+3. **Configure Environment Variables**  
+    Create a `.env` file in the root directory of your project based on the provided `.env.local` file. This file should contain your environment-specific settings.
+    ```bash
+    NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-url.supabase.co
+    NEXT_PUBLIC_SUPABASE_KEY=your-supabase-key
+    TELEGRAM_TOKEN=your-telegram-token
+    USER_ID=your-user-id
+    BASE_URL=http://localhost:3000
+    NEXT_PUBLIC_BASE_URL=http://localhost:3000
+    LANGUAGE=US
+    ```
