@@ -299,7 +299,11 @@ async function webHookTelegram(data, type) {
             }
         } else if (type === 'read') {
             return await countArticles();
-        } else if (type === 'insertToken') {
+        } else if (type === 'insertMasterPrompt'){
+            return await insertMasterPrompt(data)
+        }
+        
+        else if (type === 'insertToken') {
             const { secretkey } = data;
 
             if (!secretkey) {
@@ -449,6 +453,105 @@ async function getSingleDatas(id, type) {
     }
 }
 
+
+async function SinglePost(slug) {
+    const { data, error } = await supabase
+        .from('articles_ai')
+        .select('id, slug, title, category, data, keywords, timestamp, hit')
+        .eq('slug', slug)
+        .single();
+
+    if (error) {
+        console.error('Error fetching article:', error);
+        return null;
+    }
+
+    // Optional: update hit counter
+    await supabase
+        .from('articles_ai')
+        .update({ hit: data.hit + 1 })
+        .eq('slug', slug);
+
+    return data;
+}
+
+async function getSinglePostWithImage(slug) {
+    const article = await SinglePost(slug);
+
+    if (!article) return null;
+
+    const { data: imageData, error: imageError } = await supabase
+        .from('images_ai')
+        .select('image_data')
+        .eq('slug', slug)
+        .single();
+
+    if (imageError) {
+        console.error('Error fetching image data:', imageError);
+        return null;
+    }
+
+    return {
+        ...article,
+        image_data: imageData?.image_data || null
+    };
+}
+
+// Function to get master prompt by type
+async function getMasterPromptByType(type) {
+    try {
+        const { data, error } = await supabase
+            .from('master_prompt')
+            .select('*')
+            .eq('type', type)
+            .single();
+
+        if (error) {
+            throw new Error('Error Fetching Master Prompt: ' + error.message);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error in getMasterPromptByType function:', error.message);
+        throw error;
+    }
+}
+
+// Function to insert a new master prompt
+async function insertMasterPrompt(promptData) {
+    try {
+        // Ensure type is unique
+        const { data: existingPrompt, error: fetchError } = await supabase
+            .from('master_prompt')
+            .select('id')
+            .eq('type', promptData.type)
+            .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') {  // PGRST116: No rows found
+            throw new Error('Error Checking Existing Master Prompt: ' + fetchError.message);
+        }
+
+        if (existingPrompt) {
+            throw new Error(`Master Prompt with type "${promptData.type}" already exists.`);
+        }
+
+        // Insert new prompt
+        const { data, error } = await supabase
+            .from('master_prompt')
+            .insert([promptData])
+            .single();
+
+        if (error) {
+            throw new Error('Error Inserting Master Prompt: ' + error.message);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error in insertMasterPrompt function:', error.message);
+        throw error;
+    }
+}
+
 export {
     saveArticle,
     saveImage,
@@ -459,5 +562,8 @@ export {
     getRandomIdeas,
     getRandomGoogle,
     getSingleDatas,
-    insertArticles
+    insertArticles,
+    SinglePost,
+    getSinglePostWithImage,
+    getMasterPromptByType
 };

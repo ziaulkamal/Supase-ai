@@ -1,6 +1,6 @@
 
 
-const Breadcrumb = () => {
+const Breadcrumb = ({title, category, slug}) => {
     return(
         <div className="echo-breadcrumb-area">
             <div className="container">
@@ -10,13 +10,12 @@ const Breadcrumb = () => {
                     <div className="breadcrumb-inner text-center">
                     <div className="meta">
                         <a href="#" className="prev">
-                        ECHO /
+                        {category} /
                         </a>
                         <a href="#" className="next">
-                        Single News
+                        {slug}
                         </a>
                     </div>
-                    <h1 className="title">Standard Style 02</h1>
                     </div>
                     {/* bread crumb inner wrapper end */}
                 </div>

@@ -69,6 +69,7 @@ export async function POST(request) {
             [{ text: 'Buat Data Baru', callback_data: 'create_article' }],
             [{ text: 'Tambah Token', callback_data: 'add_token' }],
             [{ text: 'Data Konten', callback_data: 'data_content' }],
+            [{ text: 'Tambah Master Prompt', callback_data: 'add_prompt' }],
             [{ text: 'ℹ️ Bantuan', callback_data: 'help' }]
           ]
         });
@@ -103,7 +104,33 @@ export async function POST(request) {
           } else {
             await sendMessage(chatId, 'Format perintah tidak benar. Gunakan format: "Keyword"|"Category"|Negara(ID/TW/US/DE)|Total');
           }
-        } else if (userState.state === 'set_token') {
+        } else if (userState.state === 'set_prompt'){
+          if (text.includes('|')) {
+              const parts = text.split('|').map(part => part.trim());
+
+              if (parts.length !== 8) {
+                await sendMessage(chatId, "format master prompt tidak benar.");
+                return NextResponse.json({ status: 'error', message: 'Invalid command format.' });
+              }
+
+              const typeFormat    = parts[0];
+              const sectionTitle  = parts[1];
+              const sectionTwo    = parts[2];
+              const sectionThree  = parts[3];
+              const sectionFour   = parts[4];
+              const sectionFive   = parts[5];
+              const sectionSix    = parts[6];
+              const sectionComment = parts[6];
+
+              await webHookTelegram({ typeFormat, sectionTitle, sectionTwo, sectionThree, sectionFour, sectionFive, sectionSix, sectionComment }, 'insertMasterPrompt')
+              await sendMessage(chatId, 'Berhasil !, Master Prompt sudah ditambahkan ke database');
+          }
+          await webHookTelegram({data}, 'insertMasterPrompt')
+          await sendMessage(chatId, 'Berhasil menambahkan master prompt')
+        }
+        
+        
+        else if (userState.state === 'set_token') {
           if (text.length < 5) { // Misalnya, token harus lebih dari 5 karakter
             await sendMessage(chatId, 'Token tidak valid. Pastikan token memiliki panjang yang benar.');
             return;
@@ -133,6 +160,9 @@ export async function POST(request) {
       } else if (data === 'add_token') {
         await sendMessage(chatId, 'Masukkan secret key token');
         userStateCache.set(chatId, { state: 'set_token' });
+      } else if (data === 'add_prompt') {
+        await sendMessage(chatId, 'Masukkan secret key token');
+        userStateCache.set(chatId, { state: 'set_prompt' });
       } else if (data === 'data_content') {
         try {
           const response = await webHookTelegram(null, 'read');
@@ -163,6 +193,11 @@ Selamat datang di bot kami! Berikut adalah fitur-fitur yang tersedia:
 
 📊 **Data Konten**
 - Klik tombol ini untuk mendapatkan informasi jumlah artikel dan kategori.
+- Bot akan memberikan jumlah artikel dan kategori yang ada dalam sistem.
+
+
+📊 **Tambah Master Prompt**
+- Klik tombol ini untuk memulai atur master prompt untuk setiap kategori. Kirimkan data dalam Format berikut : tipe|isi perintah prompt sesi 1 untuk mengatur title dan slug|isi perintah prompt untuk mengatur section 2|isi perintah prompt untuk mengatur section 3|isi perintah prompt untuk mengatur section 4|isi perintah prompt untuk mengatur section 5|isi perintah prompt untuk mengatur section 6|berikan komentar terkait untuk penggunaan
 - Bot akan memberikan jumlah artikel dan kategori yang ada dalam sistem.
 
 

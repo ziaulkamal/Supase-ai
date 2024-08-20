@@ -1,6 +1,7 @@
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
+import Single from './components/Single';
 
 export const metadata = {
   title: "Create Next App",
