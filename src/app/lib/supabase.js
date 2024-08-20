@@ -519,12 +519,14 @@ async function getMasterPromptByType(type) {
 
 // Function to insert a new master prompt
 async function insertMasterPrompt(promptData) {
+    const { typeFormat, sectionTitle, sectionTwo, sectionThree, sectionFour, sectionFive, sectionSix, sectionComment } = promptData;
+
     try {
         // Ensure type is unique
         const { data: existingPrompt, error: fetchError } = await supabase
             .from('master_prompt')
             .select('id')
-            .eq('type', promptData.type)
+            .eq('type', typeFormat)
             .single();
 
         if (fetchError && fetchError.code !== 'PGRST116') {  // PGRST116: No rows found
@@ -538,8 +540,19 @@ async function insertMasterPrompt(promptData) {
         // Insert new prompt
         const { data, error } = await supabase
             .from('master_prompt')
-            .insert([promptData])
-            .single();
+            .upsert([
+                {
+                    type : typeFormat,
+                    section_title_slug : sectionTitle,
+                    section_two : sectionTwo,
+                    section_three : sectionThree,
+                    section_four : sectionFour,
+                    section_five : sectionFive,
+                    section_six : sectionSix,
+                    comment : sectionComment,
+                }
+            ]);
+            
 
         if (error) {
             throw new Error('Error Inserting Master Prompt: ' + error.message);
