@@ -161,7 +161,7 @@ export async function POST(request) {
         await sendMessage(chatId, 'Masukkan secret key token');
         userStateCache.set(chatId, { state: 'set_token' });
       } else if (data === 'add_prompt') {
-        await sendMessage(chatId, 'Masukkan secret key token');
+        await sendMessage(chatId, 'Masukkan data prompt dalam format berikut: \n tipe|isi perintah prompt sesi 1 untuk mengatur title dan slug|isi perintah prompt untuk mengatur section 2|isi perintah prompt untuk mengatur section 3|isi perintah prompt untuk mengatur section 4|isi perintah prompt untuk mengatur section 5|isi perintah prompt untuk mengatur section 6|berikan komentar terkait untuk penggunaan');
         userStateCache.set(chatId, { state: 'set_prompt' });
       } else if (data === 'data_content') {
         try {
