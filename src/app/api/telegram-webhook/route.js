@@ -120,7 +120,7 @@ export async function POST(request) {
               const sectionFour   = parts[4];
               const sectionFive   = parts[5];
               const sectionSix    = parts[6];
-              const sectionComment = parts[6];
+              const sectionComment = parts[7];
 
               await webHookTelegram({ typeFormat, sectionTitle, sectionTwo, sectionThree, sectionFour, sectionFive, sectionSix, sectionComment }, 'insertMasterPrompt')
               await sendMessage(chatId, 'Berhasil !, Master Prompt sudah ditambahkan ke database');
