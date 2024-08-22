@@ -565,6 +565,27 @@ async function insertMasterPrompt(promptData) {
     }
 }
 
+async function getTopCategories() {
+    try {
+        const { data, error } = await supabase
+            .from('articles_ai')
+            .select('category, SUM(hit) as total_hits')
+            .groupBy('category')
+            .order('total_hits', { ascending: false })
+            .limit(6);
+
+        if (error) {
+            throw error;
+        }
+
+        // console.log(data);
+        return data.map(row => row.category);
+    } catch (error) {
+        console.error('Error fetching top categories:', error);
+        return [];
+    }
+}
+
 export {
     saveArticle,
     saveImage,
@@ -578,5 +599,6 @@ export {
     insertArticles,
     SinglePost,
     getSinglePostWithImage,
-    getMasterPromptByType
+    getMasterPromptByType,
+    getTopCategories
 };

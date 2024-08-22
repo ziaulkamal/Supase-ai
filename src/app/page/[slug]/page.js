@@ -3,28 +3,25 @@
 import { useState, useEffect } from 'react';
 import Single from '@/app/components/Single';
 import { getSinglePostWithImage } from '@/app/lib/supabase';
+import NotFound from '@/app/components/NotFound';
 
 export default function Page({ params }) {
   const { slug } = params;
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       const articleWithImage = await getSinglePostWithImage(slug);
       setData(articleWithImage);
-      setLoading(false);
+
     }
 
     fetchData();
   }, [slug]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   if (!data) {
-    return <div>Artikel tidak ditemukan</div>;
+    return <NotFound />;
   }
 
   return (
