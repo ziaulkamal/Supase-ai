@@ -49,7 +49,7 @@ export async function POST(request) {
     const userState = userStateCache.get(chatId);
 
     if (message) {
-      const text = message.text.trim().toLowerCase();
+      const text = message.text.trim();
 
       // Cek jika perintah untuk mengakhiri sesi
       if (text === '/end') {
@@ -135,7 +135,7 @@ export async function POST(request) {
             await sendMessage(chatId, 'Token tidak valid. Pastikan token memiliki panjang yang benar.');
             return;
           }
-          
+          console.log(text);
           await webHookTelegram({secretkey:text}, 'insertToken');
           await sendMessage(chatId, 'Berhasil menambahkan Token Baru ');
         }else if(userState.state === 'set_count'){
