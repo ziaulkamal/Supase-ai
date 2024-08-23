@@ -136,7 +136,7 @@ export async function POST(request) {
             return;
           }
           console.log(text);
-          await webHookTelegram({secretkey:text}, 'insertToken');
+          await webHookTelegram(text, 'insertToken');
           await sendMessage(chatId, 'Berhasil menambahkan Token Baru ');
         }else if(userState.state === 'set_count'){
           const response = await webHookTelegram(null, 'read');

@@ -139,7 +139,7 @@ async function insertToken(secretkey) {
             .from('geminitoken')
             .upsert([
                 {
-                    secretkey: jsonSecretKey,
+                    secretkey: secretkey,
                     url_endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
                     status: true
                 }
