@@ -122,14 +122,11 @@ async function insertToken(secretkey) {
             throw new Error('Missing secretkey');
         }
 
-        // Simpan secretkey sebagai JSON dengan kunci "key"
-        const jsonSecretKey = JSON.stringify({ key: secretkey });
-
         const { error } = await supabase
             .from('geminitoken')
             .upsert([
                 {
-                    secretkey: jsonSecretKey,
+                    secretkey,
                     url_endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
                     status: true
                 }
