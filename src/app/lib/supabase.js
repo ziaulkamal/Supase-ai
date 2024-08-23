@@ -94,15 +94,6 @@ async function getAndHitToken() {
             throw new Error(fetchError?.message || 'Token not found');
         }
 
-        // Menguraikan JSON secretkey
-        let secretkey;
-        try {
-            const secretkeyObject = JSON.parse(tokenData.secretkey);
-            secretkey = secretkeyObject.key;
-        } catch (parseError) {
-            throw new Error('Error parsing secretkey JSON: ' + parseError.message);
-        }
-
         const tokenId = tokenData.id;
 
         const { error: updateError } = await supabase
@@ -115,7 +106,7 @@ async function getAndHitToken() {
         }
 
         return {
-            token: secretkey,  // Menggunakan secretkey yang telah diuraikan
+            token: tokenData.secretkey,
             endpoint: tokenData.url_endpoint,
             status: 'success'
         };
@@ -124,7 +115,6 @@ async function getAndHitToken() {
         throw error;
     }
 }
-
 
 async function insertToken(secretkey) {
     try {
@@ -139,7 +129,7 @@ async function insertToken(secretkey) {
             .from('geminitoken')
             .upsert([
                 {
-                    secretkey: secretkey,
+                    secretkey: jsonSecretKey,
                     url_endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
                     status: true
                 }

@@ -135,8 +135,8 @@ export async function POST(request) {
             await sendMessage(chatId, 'Token tidak valid. Pastikan token memiliki panjang yang benar.');
             return;
           }
-          console.log(text);
-          await webHookTelegram(text, 'insertToken');
+          
+          await webHookTelegram({secretkey:text}, 'insertToken');
           await sendMessage(chatId, 'Berhasil menambahkan Token Baru ');
         }else if(userState.state === 'set_count'){
           const response = await webHookTelegram(null, 'read');
