@@ -15,7 +15,7 @@ export async function scrapeImages(query, limit = 10) {
 
         const results = await GOOGLE_IMG_SCRAP({
             search: query,
-            custom: "landscape",
+            custom: "landscape -instagram.com -facebook.com",
 
             query: {
                 EXTENSION: GOOGLE_QUERY.EXTENSION.JPG,

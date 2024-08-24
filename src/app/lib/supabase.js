@@ -7,16 +7,17 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function getSettings() {
     try {
+        // Cek apakah ada baris data di tabel 'settings'
         const { data: existingSettings, error: fetchError } = await supabase
             .from('settings')
-            .select('bygoogles, bykeywords')
-            .single();
+            .select('bygoogles, bykeywords');
 
         if (fetchError) {
             throw new Error('Error Fetching Settings: ' + fetchError.message);
         }
 
-        if (!existingSettings) {
+        // Jika tidak ada data, buat entri baru
+        if (existingSettings.length === 0) {
             const { data: insertedData, error: insertError } = await supabase
                 .from('settings')
                 .insert([{ bygoogles: false, bykeywords: true, updated_at: new Date() }])
@@ -29,7 +30,15 @@ async function getSettings() {
             return { bygoogles: insertedData.bygoogles, bykeywords: insertedData.bykeywords };
         }
 
-        return { bygoogles: existingSettings.bygoogles, bykeywords: existingSettings.bykeywords };
+        // Jika ada lebih dari satu baris, tangani situasi ini
+        if (existingSettings.length > 1) {
+            throw new Error('Multiple settings found. Ensure only one settings row exists.');
+        }
+
+        // Kembalikan data jika ada tepat satu baris
+        const setting = existingSettings[0];
+        return { bygoogles: setting.bygoogles, bykeywords: setting.bykeywords };
+
     } catch (error) {
         console.error('Error in getSettings function:', error.message);
         throw error;
