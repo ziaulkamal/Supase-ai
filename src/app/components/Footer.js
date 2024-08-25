@@ -10,7 +10,7 @@ const Footer = () => {
                     <div className="copyright-area-inner">
 
                         <div className="copyright-content">
-                        <h5 className="title">© Copyright 2023 by Echo</h5>
+                        <h5 className="title">© Engine dev Schematique</h5>
                         </div>
                         <div className="select-area">
                         <select name="lang" id="lang">
