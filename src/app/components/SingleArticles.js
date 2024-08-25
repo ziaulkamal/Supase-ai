@@ -1,6 +1,6 @@
 import Breadcrumb from "./Breadcrumb";
 import SingleSidebar from "./SingleSidebar";
-
+import Link from 'next/link';
 
 const SingleArticles = ({ content , title, author, image, category, date, hit }) => {
     return(
@@ -15,36 +15,36 @@ const SingleArticles = ({ content , title, author, image, category, date, hit })
                             <div className="echo-hero-baner">
                             <span className="content-catagory-tag">{category}</span>
                             <h2 className="echo-hero-title text-capitalize font-weight-bold">
-                                <a href="post-details.html" className="title-hover">
+                                <Link href="post-details.html" className="title-hover">
                                 The Asus ROG Ally will start at $600 with AMD Z1
-                                </a>
+                                </Link>
                             </h2>
                             <div className="echo-hero-area-titlepost-post-like-comment-share">
                                 <div className="echo-hero-area-like-read-comment-share">
-                                <a href="#">
+                                <Link href="#">
                                     <i className="fa-light fa-clock" /> 06 minute read
-                                </a>
+                                </Link>
                                 </div>
                                 <div className="echo-hero-area-like-read-comment-share">
-                                <a href="#">
+                                <Link href="#">
                                     <i className="fa-light fa-eye" /> 3.5k Views
-                                </a>
+                                </Link>
                                 </div>
                                 <div className="echo-hero-area-like-read-comment-share">
-                                <a href="#">
+                                <Link href="#">
                                     <i className="fa-light fa-arrow-up-from-bracket" /> 1.5k
                                     Share
-                                </a>
+                                </Link>
                                 </div>
                             </div>
                             <div className="echo-inner-img-ct-1  img-transition-scale">
-                                <a href="post-details.html">
+                                <Link href="post-details.html">
                                 <img
                                     src="/images/category-style-1/item-11.png"
                                     alt="Echo"
                                     className="echo-post-style-3-hero-banner"
                                 />
-                                </a>
+                                </Link>
                             </div>
                             <p className="echo-hero-discription">
                                 Mauris in aliquam sem fringilla ut morbi tincidunt augue. Odio
@@ -238,46 +238,46 @@ const SingleArticles = ({ content , title, author, image, category, date, hit })
                                 <div className="col-lg-6 col-md-6">
                                     <div className="echo-top-story">
                                     <div className="echo-story-picture img-transition-scale">
-                                        <a href="post-details.html">
+                                        <Link href="post-details.html">
                                         <img
                                             src="/images/home-1/trending-left/item-9.png"
                                             alt="Echo"
                                             className="img-hover"
                                         />
-                                        </a>
+                                        </Link>
                                     </div>
                                     <div className="echo-story-text">
                                         <h6>
-                                        <a href="#" className="title-hover">
+                                        <Link href="#" className="title-hover">
                                             ChatGPT returns to Italy after ban
-                                        </a>
+                                        </Link>
                                         </h6>
-                                        <a href="#" className="pe-none">
+                                        <Link href="#" className="pe-none">
                                         <i className="fa-light fa-clock" /> 06 minute read
-                                        </a>
+                                        </Link>
                                     </div>
                                     </div>
                                 </div>
                                 <div className="col-lg-6 col-md-6">
                                     <div className="echo-top-story">
                                     <div className="echo-story-picture img-transition-scale">
-                                        <a href="post-details.html">
+                                        <Link href="post-details.html">
                                         <img
                                             src="/images/home-1/trending-left/item-10.png"
                                             alt="Echo"
                                             className="img-hover"
                                         />
-                                        </a>
+                                        </Link>
                                     </div>
                                     <div className="echo-story-text">
                                         <h6>
-                                        <a href="#" className="title-hover">
+                                        <Link href="#" className="title-hover">
                                             Meta to wind down NFTs on platforms...
-                                        </a>
+                                        </Link>
                                         </h6>
-                                        <a href="#" className="pe-none">
+                                        <Link href="#" className="pe-none">
                                         <i className="fa-light fa-clock" /> 06 minute read
-                                        </a>
+                                        </Link>
                                     </div>
                                     </div>
                                 </div>

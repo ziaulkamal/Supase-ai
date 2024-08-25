@@ -1,16 +1,16 @@
 
-
+import Link from 'next/link';
 const Popup = () => {
     return(
         <div className="echo-popup-model" id="id01">
             <div className="echo-popup-transition">
                 <div className="model-content animate-subscribe-popup">
-                <a
+                <Link
                     href="#!"
                     onclick="document.getElementById('id01').style.display='none'"
                 >
                     <i className="fa-regular fa-xmark" />
-                </a>
+                </Link>
                 <div className="echo-p-flexing">
                     <div className="echo-p-img">
                     <img

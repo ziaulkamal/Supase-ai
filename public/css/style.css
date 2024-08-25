@@ -34419,4 +34419,26 @@ html[data-theme=dark] body.home-two .echo-footer-area.footer-2 .echo-get-in-tuch
   background-color: transparent;
   color: #5E5E5E;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #D3D3D3; /* Warna abu-abu */
+}
+
+thead th {
+    border: 1px solid #000; /* Garis solid hitam */
+    padding: 8px;
+    text-align: left;
+}
+
+tbody td {
+    border: 1px solid #000; /* Garis solid hitam */
+    padding: 8px;
+}
+
+
 /*# sourceMappingURL=../maps/style.css.map */

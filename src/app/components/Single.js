@@ -1,15 +1,24 @@
-
+import React from 'react';
 import Breadcrumb from './Breadcrumb';
 import SingleAuthor from './SingleAuthor';
 import SingleSidebar from './SingleSidebar';
 import Readmore from './Readmore';
+import OpenGraph from './OpenGraph';
+import Link from 'next/link';
 
-const parseHTMLString = (htmlString) => {
-    let h1Found = false;
+
+const parseHTMLString = (htmlString, images) => {
+    let imageIndex = 0;
+    let addedImageAfterHeading = false;
 
     // Function to clean the text content
     const cleanText = (text) => {
         return text.replace(/(^,)|(,$)/g, ''); // Remove leading and trailing commas
+    };
+
+    // Function to add margin to headings
+    const addHeadingWithMargin = (headingTag) => {
+        return `${headingTag}<div style="margin-bottom: 20px;"></div>`; // Adjust margin as needed
     };
 
     // Split by tags while preserving the tags
@@ -17,43 +26,28 @@ const parseHTMLString = (htmlString) => {
 
     // Initialize an empty array to hold the cleaned HTML
     let result = '';
-    
+
     // Iterate through fragments and build the resulting HTML string
     fragments.forEach((fragment, index) => {
-        if (fragment.startsWith('<h1>') && !h1Found) {
-            h1Found = true; // Skip the first <h1> tag
-            return;
-        } else if (fragment.startsWith('</h1>')) {
-            result += '</h2>'; // Convert </h1> to </h2>
-            return;
-        } else if (fragment.startsWith('<h1>')) {
-            result += '<h2 class="title">'; // Convert <h1> to <h2>
-            return;
+        if (fragment.startsWith('<h1>') || fragment.startsWith('<h2>') || fragment.startsWith('<h3>') || fragment.startsWith('<h4>') || fragment.startsWith('<h5>')) {
+            // Add the heading tag with margin
+            result += addHeadingWithMargin(fragment);
+
+            // If it's not the first heading, insert an image after it
+            if (addedImageAfterHeading && images[imageIndex]) {
+                result += `<img src="${images[imageIndex].url}" alt="${images[imageIndex].title}" class="post-inline-img" />`;
+                imageIndex++;
+            }
+
+            // Mark that an image should be added after the next heading
+            addedImageAfterHeading = true;
         } else if (fragment.startsWith('<p>') && fragment.endsWith('</p>')) {
             const text = cleanText(fragment.replace(/<\/?p>/g, ''));
             if (text) {
                 result += `<p class="echo-hero-discription">${text}</p>`;
             }
-        } else if (fragment.startsWith('<h5>') && fragment.endsWith('</h5>')) {
-            const text = cleanText(fragment.replace(/<\/?h5>/g, ''));
-            if (text) {
-                result += `<h5 class="title">${text}</h5>`;
-            }
-        } else if (fragment.startsWith('<h4>') && fragment.endsWith('</h4>')) {
-            const text = cleanText(fragment.replace(/<\/?h4>/g, ''));
-            if (text) {
-                result += `<h4 class="title">${text}</h4>`;
-            }
-        } else if (fragment.startsWith('<h3>') && fragment.endsWith('</h3>')) {
-            const text = cleanText(fragment.replace(/<\/?h3>/g, ''));
-            if (text) {
-                result += `<h3 class="title">${text}</h3>`;
-            }
-        } else if (fragment.startsWith('<h2>') && fragment.endsWith('</h2>')) {
-            const text = cleanText(fragment.replace(/<\/?h2>/g, ''));
-            if (text) {
-                result += `<h2 class="title">${text}</h2>`;
-            }
+            // Reset image addition status after a paragraph is added
+            addedImageAfterHeading = false;
         } else {
             const cleanedFragment = cleanText(fragment);
             if (cleanedFragment) {
@@ -62,83 +56,110 @@ const parseHTMLString = (htmlString) => {
         }
     });
 
-    // Handle any remaining open tags
-    if (result.endsWith('<h1 class="title">')) {
-        result = result.replace(/<h1 class="title">$/, '<h2 class="title">');
-    }
-    if (result.endsWith('</h1>')) {
-        result = result.replace(/<\/h1>$/, '</h2>');
-    }
-
     return result;
 };
 
 
+const extractRandomParagraph = (htmlString) => {
+    // Hapus semua tag HTML kecuali <p>
+    const cleanedHtml = htmlString.replace(/<(?!\/?p\b)[^>]+>/g, "");
 
-const Single = ({title, slug, category, data, date, image}) => {
-    const parsedData = parseHTMLString(data);
-    return(
+    // Ambil semua teks dalam tag <p>
+    const paragraphs = cleanedHtml.match(/<p>(.*?)<\/p>/g);
+
+    if (!paragraphs) {
+        return ''; // Tidak ada paragraf ditemukan
+    }
+
+    // Ekstrak teks dari tag <p>
+    const paragraphTexts = paragraphs.map(p => p.replace(/<\/?p>/g, ''));
+
+    // Pilih paragraf acak
+    const randomParagraph = paragraphTexts[Math.floor(Math.random() * paragraphTexts.length)];
+
+    // Potong paragraf menjadi 180 karakter
+    const snippet = randomParagraph.substring(0, 180);
+
+    return snippet;
+};
+
+const getRandomNumber = (min, max) => {
+    if (min > max) {
+        throw new Error('Min harus lebih kecil atau sama dengan max');
+    }
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const Single = ({ title, slug, category, data, date, image, keywords, hit }) => {
+    // Shuffle the image array to randomize the images
+    const shuffledImages = [...image].sort(() => 0.5 - Math.random());
+
+    const parsedData = parseHTMLString(data, shuffledImages);
+
+    return (
         <>
+            <OpenGraph
+                title={title}
+                slug={slug}
+                image={shuffledImages[0].url}
+                shorts={extractRandomParagraph(parsedData)}
+                keywords={keywords}
+            />
             <Breadcrumb title={title} slug={slug} category={category} />
             <section className="echo-hero-section inner inner-post">
-            <div className="echo-hero">
-                <div className="container">
-                <div className="echo-full-hero-content">
-                    <div className="row gx-5 sticky-coloum-wrap">
-                    <div className="col-xl-8 col-lg-8">
-                        <div className="echo-hero-baner">
-                        <div className="echo-inner-img-ct-1  img-transition-scale">
-                            <a href="post-details.html">
-                            <img
-                                src="/images/category-style-1/item-1.png"
-                                alt="Echo"
-                                className="post-style-1-frist-hero-img"
-                            />
-                            </a>
+                <div className="echo-hero">
+                    <div className="container">
+                        <div className="echo-full-hero-content">
+                            <div className="row gx-5 sticky-coloum-wrap">
+                                <div className="col-xl-8 col-lg-8">
+                                    <div className="echo-hero-baner">
+                                        <div className="echo-inner-img-ct-1  img-transition-scale">
+                                            <Link href={`/${slug}`}>
+                                                <img
+                                                    src={shuffledImages[0].url}
+                                                    alt={shuffledImages[0].title}
+                                                    className="post-style-1-frist-hero-img"
+                                                />
+                                            </Link>
+                                        </div>
+                                        <h2 className="echo-hero-title text-capitalize font-weight-bold">
+                                            <Link href={`/${slug}`} className="title-hover">
+                                                {title}
+                                            </Link>
+                                        </h2>
+                                        <div className="echo-hero-area-titlepost-post-like-comment-share">
+                                            <div className="echo-hero-area-like-read-comment-share">
+                                                <Link href="#">
+                                                    <i className="fa-light fa-clock" /> 06 minute read
+                                                </Link>
+                                            </div>
+                                            <div className="echo-hero-area-like-read-comment-share">
+                                                <Link href="#">
+                                                    <i className="fa-light fa-eye" /> {hit} Views
+                                                </Link>
+                                            </div>
+                                            <div className="echo-hero-area-like-read-comment-share">
+                                                <Link href="#">
+                                                    <i className="fa-light fa-comment-dots" /> 0 Comment
+                                                </Link>
+                                            </div>
+                                            <div className="echo-hero-area-like-read-comment-share">
+                                                <Link href="#">
+                                                    <i className="fa-light fa-arrow-up-from-bracket" /> {getRandomNumber(111,9999)} Share
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        <main dangerouslySetInnerHTML={{ __html: parsedData }}></main>
+                                        <div className="keyword mb-5" > <strong>Keywords: </strong> {keywords}</div>
+                                    </div>
+                                    <Readmore slug={slug} />
+                                </div>
+                                <SingleSidebar />
+                            </div>
                         </div>
-                        <h2 className="echo-hero-title text-capitalize font-weight-bold">
-                            <a href="post-details.html" className="title-hover">
-                            {title}
-                            </a>
-                        </h2>
-                        <div className="echo-hero-area-titlepost-post-like-comment-share">
-                            <div className="echo-hero-area-like-read-comment-share">
-                            <a href="#">
-                                <i className="fa-light fa-clock" /> 06 minute read
-                            </a>
-                            </div>
-                            <div className="echo-hero-area-like-read-comment-share">
-                            <a href="#">
-                                <i className="fa-light fa-eye" /> 3.5k Views
-                            </a>
-                            </div>
-                            <div className="echo-hero-area-like-read-comment-share">
-                            <a href="#">
-                                <i className="fa-light fa-comment-dots" /> 05 Comment
-                            </a>
-                            </div>
-                            <div className="echo-hero-area-like-read-comment-share">
-                            <a href="#">
-                                <i className="fa-light fa-arrow-up-from-bracket" /> 1.5k
-                                Share
-                            </a>
-                            </div>
-                        </div>
-                        <main dangerouslySetInnerHTML={{ __html: parsedData }}></main>
-                        
-
-                        </div>
-
-                        <SingleAuthor />
-                        <Readmore />
-                    </div>
-                    <SingleSidebar />
                     </div>
                 </div>
-                </div>
-            </div>
             </section>
-        
         </>
     );
 }

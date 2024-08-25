@@ -20,9 +20,9 @@ const NotFound = () => {
                         </p>
                         </div>
                         <div className="error-btn">
-                        <a href="index.html" className="text-capitalize">
+                        <Link href="index.html" className="text-capitalize">
                             go back home
-                        </a>
+                        </Link>
                         </div>
                     </div>
                     </div>

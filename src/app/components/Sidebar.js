@@ -1,6 +1,6 @@
 
 import MobileHeader from './MobileHeader';
-
+import Link from 'next/link';
 const Sidebar = () => {
     return(
         <div id="side-bar" className="side-bar header-one">
@@ -18,37 +18,37 @@ const Sidebar = () => {
                     <ul className="category-area">
                         <li className="item">
                         <div className="image-area">
-                            <a href="#">
+                            <Link href="#">
                             <img src="/images/category-style-1/1.png" alt="" />
-                            </a>
+                            </Link>
                         </div>
                         <div className="content">
                             <div className="recent-post-title">
-                            <a href="#">The incident began as an argument among.</a>
+                            <Link href="#">The incident began as an argument among.</Link>
                             </div>
                             <p className="desc">
-                            <a href="#">
+                            <Link href="#">
                                 <i className="fa-light fa-user" />
                                 Asley Graham
-                            </a>
+                            </Link>
                             </p>
                         </div>
                         </li>
                         <li className="item">
                         <div className="image-area">
-                            <a href="#">
+                            <Link href="#">
                             <img src="/images/category-style-1/2.png" alt="" />
-                            </a>
+                            </Link>
                         </div>
                         <div className="content">
                             <div className="recent-post-title">
-                            <a href="#">The incident began as an argument among.</a>
+                            <Link href="#">The incident began as an argument among.</Link>
                             </div>
                             <p className="desc">
-                            <a href="#">
+                            <Link href="#">
                                 <i className="fa-light fa-user" />
                                 Emily Dicingson
-                            </a>
+                            </Link>
                             </p>
                         </div>
                         </li>

@@ -2,6 +2,7 @@
 export default function Home() {
   return (
     <>
+      <title>{process.env.SITE_NAME}</title>
       <section className="echo-hero-section">
         <div className="echo-hero">
           <div className="container">

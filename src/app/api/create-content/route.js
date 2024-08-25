@@ -1,4 +1,4 @@
-import { generateSessionDataWithRetry, formatSessionData } from "@/app/lib/gemini";
+import { generateSessionDataWithRetry, formatSessionData } from "@/app/lib/geminiSchema";
 import { getSingleDatas, insertArticles } from "@/app/lib/supabase";
 import { cleanFormat } from "@/app/utils/formatJson";
 import { NextResponse } from "next/server";
@@ -40,14 +40,14 @@ export async function GET(request) {
             );
         }
 
-        const langCode = singleDatas.lang; 
+        const langCode = `${singleDatas.lang}_${singleDatas.lang}`; 
         const prompt = singleDatas.prompt;
         const category = singleDatas.category;
 
         const results = {};
 
         for (let sessionType = 1; sessionType <= 7; sessionType++) {
-            const response = await generateSessionDataWithRetry(prompt, langCode, 'neutral', sessionType);
+            const response = await generateSessionDataWithRetry(prompt, langCode.toLocaleLowerCase(), 'neutral', sessionType);
             results[`session_${sessionType}`] = formatSessionData(response);
         }
 

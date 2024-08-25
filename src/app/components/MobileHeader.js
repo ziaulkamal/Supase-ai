@@ -1,48 +1,48 @@
 
-
+import Link from 'next/link';
 const MobileHeader = () => {
     return(
         <div className="mobile-menu d-block d-lg-none">
                 <nav className="nav-main mainmenu-nav mt--30">
                 <ul className="mainmenu" id="mobile-menu">
                     <li className="menu-item">
-                    <a href="#" className="main mobile-menu-link">
+                    <Link href="#" className="main mobile-menu-link">
                         Home
-                    </a>
+                    </Link>
                     </li>
                     <li className="menu-item">
-                    <a className="main mobile-menu-link" href="contact.html">
+                    <Link className="main mobile-menu-link" href="contact.html">
                         Contact
-                    </a>
+                    </Link>
                     </li>
                 </ul>
                 </nav>
                 <div className="social-wrapper-one">
                 <ul>
                     <li>
-                    <a href="#">
+                    <Link href="#">
                         <i className="fa-brands fa-facebook-f" />
-                    </a>
+                    </Link>
                     </li>
                     <li>
-                    <a href="#">
+                    <Link href="#">
                         <i className="fa-brands fa-twitter" />
-                    </a>
+                    </Link>
                     </li>
                     <li>
-                    <a href="#">
+                    <Link href="#">
                         <i className="fa-brands fa-youtube" />
-                    </a>
+                    </Link>
                     </li>
                     <li>
-                    <a href="#">
+                    <Link href="#">
                         <i className="fa-brands fa-instagram" />
-                    </a>
+                    </Link>
                     </li>
                     <li>
-                    <a href="#">
+                    <Link href="#">
                         <i className="fa-brands fa-linkedin-in" />
-                    </a>
+                    </Link>
                     </li>
                 </ul>
                 </div>

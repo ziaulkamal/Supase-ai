@@ -183,7 +183,7 @@ async function insertArticles(result) {
             throw new Error('Error Saving Article: ' + error.message);
         }
 
-        const imageJson = await processImages(slug, 20);
+        const imageJson = await processImages(title, 20);
         await saveImage(slug, imageJson);
         return 'success';
     } catch (error) {
@@ -595,6 +595,82 @@ async function getTopCategories() {
     }
 }
 
+async function getNextAndPrevious(slug) {
+    try {
+        // Fetch current article based on slug
+        const { data: currentArticle, error: fetchError } = await supabase
+            .from('articles_ai')
+            .select('*')
+            .eq('slug', slug)
+            .single(); // .single() will throw an error if more than one row is found
+
+        if (fetchError) {
+            throw new Error('Error Fetching Current Article: ' + fetchError.message);
+        }
+
+        if (!currentArticle) {
+            throw new Error('Current article not found');
+        }
+
+        // Fetch previous article
+        const { data: previousArticles, error: prevError } = await supabase
+            .from('articles_ai')
+            .select('*')
+            .lt('id', currentArticle.id) // Get articles with ID less than current article's ID
+            .order('id', { ascending: false }) // Order by ID descending
+            .limit(1);
+
+        if (prevError) {
+            throw new Error('Error Fetching Previous Article: ' + prevError.message);
+        }
+
+        const previousArticle = previousArticles.length > 0 ? previousArticles[0] : null;
+
+        // Fetch next article
+        const { data: nextArticles, error: nextError } = await supabase
+            .from('articles_ai')
+            .select('*')
+            .gt('id', currentArticle.id) // Get articles with ID greater than current article's ID
+            .order('id', { ascending: true }) // Order by ID ascending
+            .limit(1);
+
+        if (nextError) {
+            throw new Error('Error Fetching Next Article: ' + nextError.message);
+        }
+
+        const nextArticle = nextArticles.length > 0 ? nextArticles[0] : null;
+
+        return {
+            previous: previousArticle,
+            next: nextArticle
+        };
+    } catch (error) {
+        console.error('Error in getNextAndPrevious:', error.message);
+        throw error;
+    }
+}
+
+async function getLatestArticles(limit = 5) {
+    try {
+        // Fetch the latest articles
+        const { data: articles, error } = await supabase
+            .from('articles_ai')
+            .select('*')
+            .order('timestamp', { ascending: false }) // Order by timestamp descending
+            .limit(limit); // Limit the number of results
+
+        if (error) {
+            throw new Error('Error Fetching Latest Articles: ' + error.message);
+        }
+
+        return articles;
+    } catch (error) {
+        console.error('Error in getLatestArticles:', error.message);
+        throw error;
+    }
+}
+
+
 export {
     saveArticle,
     saveImage,
@@ -609,5 +685,7 @@ export {
     SinglePost,
     getSinglePostWithImage,
     getMasterPromptByType,
-    getTopCategories
+    getTopCategories,
+    getNextAndPrevious,
+    getLatestArticles
 };

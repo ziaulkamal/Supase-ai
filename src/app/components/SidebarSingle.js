@@ -1,3 +1,4 @@
+import Link from 'next/link';
 const SidebarSingle = () => {
     return(
         <div className="col-xl-4 col-lg-4 sticky-coloum-item">
@@ -38,86 +39,86 @@ const SidebarSingle = () => {
                             <h5 className="text-center">Top Story</h5>
                             <div className="echo-top-story">
                             <div className="echo-story-picture img-transition-scale">
-                                <a href="post-details.html">
+                                <Link href="post-details.html">
                                 <img
                                     src="/images/category-style-1/item-9.png"
                                     alt="Echo"
                                     className="img-hover"
                                 />
-                                </a>
+                                </Link>
                             </div>
                             <div className="echo-story-text">
                                 <h6>
-                                <a href="#" className="title-hover">
+                                <Link href="#" className="title-hover">
                                     14 Tight Samurai Games You...
-                                </a>
+                                </Link>
                                 </h6>
-                                <a href="#" className="pe-none">
+                                <Link href="#" className="pe-none">
                                 <i className="fa-light fa-clock" /> 06 minute read
-                                </a>
+                                </Link>
                             </div>
                             </div>
                             <div className="echo-top-story">
                             <div className="echo-story-picture img-transition-scale">
-                                <a href="post-details.html">
+                                <Link href="post-details.html">
                                 <img
                                     src="/images/category-style-1/item-6.png"
                                     alt="Echo"
                                     className="img-hover"
                                 />
-                                </a>
+                                </Link>
                             </div>
                             <div className="echo-story-text">
                                 <h6>
-                                <a href="#" className="title-hover">
+                                <Link href="#" className="title-hover">
                                     The Google Pixel Fold looks...
-                                </a>
+                                </Link>
                                 </h6>
-                                <a href="#" className="pe-none">
+                                <Link href="#" className="pe-none">
                                 <i className="fa-light fa-clock" /> 06 minute read
-                                </a>
+                                </Link>
                             </div>
                             </div>
                             <div className="echo-top-story">
                             <div className="echo-story-picture img-transition-scale">
-                                <a href="post-details.html">
+                                <Link href="post-details.html">
                                 <img
                                     src="/images/category-style-1/item-7.png"
                                     alt="Echo"
                                     className="img-hover"
                                 />
-                                </a>
+                                </Link>
                             </div>
                             <div className="echo-story-text">
                                 <h6>
-                                <a href="#" className="title-hover">
+                                <Link href="#" className="title-hover">
                                     ChatGPT returns to Italy after ban
-                                </a>
+                                </Link>
                                 </h6>
-                                <a href="#" className="pe-none">
+                                <Link href="#" className="pe-none">
                                 <i className="fa-light fa-clock" /> 06 minute read
-                                </a>
+                                </Link>
                             </div>
                             </div>
                             <div className="echo-top-story">
                             <div className="echo-story-picture img-transition-scale">
-                                <a href="post-details.html">
+                                <Link href="post-details.html">
                                 <img
                                     src="/images/category-style-1/item-8.png"
                                     alt="Echo"
                                     className="img-hover"
                                 />
-                                </a>
+                                </Link>
                             </div>
                             <div className="echo-story-text">
                                 <h6>
-                                <a href="#" className="title-hover">
+                                <Link href="#" className="title-hover">
                                     Avatar: The Way Of Water - how...
-                                </a>
+                                </Link>
                                 </h6>
-                                <a href="#" className="pe-none">
+                                <Link href="#" className="pe-none">
                                 <i className="fa-light fa-clock" /> 06 minute read
-                                </a>
+                                </Link>
                             </div>
                             </div>
                         </div>
@@ -135,40 +136,40 @@ const SidebarSingle = () => {
                             </div>
                             <ul className="list-unstyled">
                             <li>
-                                <a href="#">
+                                <Link href="#">
                                 <i className="fa-brands fa-facebook" />
                                 20K Fans
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link href="#">
                                 <i className="fa-brands fa-twitter" />
                                 10K Followers
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link href="#">
                                 <i className="fa-brands fa-instagram" />
                                 50K Followers
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link href="#">
                                 <i className="fa-brands fa-linkedin" />
                                 30K Followers
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link href="#">
                                 <i className="fa-brands fa-pinterest" />
                                 30K Followers
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link href="#">
                                 <i className="fa-brands fa-youtube" />
                                 04K Subscriber
-                                </a>
+                                </Link>
                             </li>
                             </ul>
                         </div>
@@ -202,12 +203,12 @@ const SidebarSingle = () => {
                         </div>
                         <div className="echo-ct-1-add">
                             <div className="echo-ct-add-img">
-                            <a href="#">
+                            <Link href="#">
                                 <img
                                 src="/images/category-style-1/item-10.png"
                                 alt="Echo"
                                 />
-                            </a>
+                            </Link>
                             </div>
                         </div>
                         </div>

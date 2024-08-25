@@ -1,5 +1,5 @@
 
-
+import Link from 'next/link';
 const Breadcrumb = ({title, category, slug}) => {
     return(
         <div className="echo-breadcrumb-area">
@@ -9,12 +9,12 @@ const Breadcrumb = ({title, category, slug}) => {
                     {/* bread crumb inner wrapper */}
                     <div className="breadcrumb-inner text-center">
                     <div className="meta">
-                        <a href="#" className="prev">
+                        <Link href="#" className="prev">
                         {category} /
-                        </a>
-                        <a href="#" className="next">
+                        </Link>
+                        <Link href="#" className="next">
                         {slug}
-                        </a>
+                        </Link>
                     </div>
                     </div>
                     {/* bread crumb inner wrapper end */}
