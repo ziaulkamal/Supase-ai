@@ -113,15 +113,6 @@ const Single = ({ title, slug, category, data, date, image, keywords, hit }) => 
                             <div className="row gx-5 sticky-coloum-wrap">
                                 <div className="col-xl-8 col-lg-8">
                                     <div className="echo-hero-baner">
-                                        <div className="echo-inner-img-ct-1  img-transition-scale">
-                                            <Link href={`/${slug}`}>
-                                                <img
-                                                    src={shuffledImages[0].url}
-                                                    alt={shuffledImages[0].title}
-                                                    className="post-style-1-frist-hero-img"
-                                                />
-                                            </Link>
-                                        </div>
                                         <h2 className="echo-hero-title text-capitalize font-weight-bold">
                                             <Link href={`/${slug}`} className="title-hover">
                                                 {title}
