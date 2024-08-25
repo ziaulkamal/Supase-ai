@@ -1,5 +1,5 @@
 
-
+import Link from 'next/link';
 const NotFound = () => {
     return(
         <div className="echo-404-page">
@@ -20,7 +20,7 @@ const NotFound = () => {
                         </p>
                         </div>
                         <div className="error-btn">
-                        <Link href="index.html" className="text-capitalize">
+                        <Link href="/" className="text-capitalize">
                             go back home
                         </Link>
                         </div>
